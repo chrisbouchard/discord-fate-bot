@@ -3,7 +3,7 @@ import environ
 import logging
 import os
 
-from . import config
+from discord_fate_bot import config
 
 bot_config = environ.to_config(config.BotConfig, os.environ)
 
