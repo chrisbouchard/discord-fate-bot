@@ -1,7 +1,8 @@
-import discord
 import environ
 import logging
 import os
+
+from discord.ext.commands import Bot
 
 from discord_fate_bot import config
 
@@ -12,24 +13,8 @@ if bot_config.log_level is not None:
 
 logger = logging.getLogger('discord_fate_bot')
 
-client = discord.Client()
+bot = Bot(command_prefix = '!')
+bot.load_extension('discord_fate_bot.roll_ext')
 
-@client.event
-async def on_ready():
-    logger.debug('READY: Logged in as %s', client.user)
-
-@client.event
-async def on_message(message):
-    logger.debug('MESSAGE: Received message: %s', message)
-
-    # Don't get into a feedback loop!
-    if message.author == client.user:
-        return
-
-    # Otherwise respond politely.
-    if message.content.startswith('!hello'):
-        await message.channel.send('Hello!')
-
-# TODO: Get a real token. (From the environment?)
-client.run(bot_config.token)
+bot.run(bot_config.token)
 
