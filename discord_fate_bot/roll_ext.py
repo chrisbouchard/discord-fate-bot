@@ -16,8 +16,8 @@ class Modifier(commands.Converter):
         return int(argument)
 
 
-class RollCog(commands.Cog):
-    @commands.command(aliases=['r'])
+class RollCog(commands.Cog, name = 'Rolling'):
+    @commands.command(aliases = ['r'], help = 'Roll with an optional modifier')
     async def roll(self, ctx, modifier: Modifier = 0):
         player = ctx.message.author
         original_command = ctx.message.content
@@ -31,7 +31,7 @@ class RollCog(commands.Cog):
 
         await ctx.send(f'{results_header}{results_roll}{results_final}')
 
-    @commands.command(aliases=['rv'])
+    @commands.command(aliases = ['rv'], help = 'Roll against static opposition')
     async def roll_vs(self, ctx, modifier: Optional[Modifier] = 0, opposition: int = 0):
         player = ctx.message.author
         original_command = ctx.message.content
