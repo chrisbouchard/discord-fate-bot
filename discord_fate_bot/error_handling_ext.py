@@ -12,6 +12,9 @@ class ErrorHandlingCog(Cog):
 
         if isinstance(error, UserInputError):
             await ctx.send(f"{player.mention} Sorry, I didn't understand: `{original_command}`")
+            return
+
+        raise error
 
 
 def setup(bot):
