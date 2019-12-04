@@ -13,6 +13,7 @@ if bot_config.log_level is not None:
 
 bot = Bot(command_prefix = '!')
 bot.load_extension('discord_fate_bot.error_handling_ext')
+bot.load_extension('discord_fate_bot.aspects_ext')
 bot.load_extension('discord_fate_bot.roll_ext')
 
 bot.run(bot_config.token)
