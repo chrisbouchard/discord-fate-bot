@@ -7,7 +7,7 @@ class ErrorHandlingCog(Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        player = ctx.message.author
+        player = ctx.author
         original_command = ctx.message.content
 
         if isinstance(error, UserInputError):

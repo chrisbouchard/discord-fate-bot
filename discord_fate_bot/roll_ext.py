@@ -22,7 +22,7 @@ class RollCog(Cog, name = 'Rolling'):
     @command(aliases = ['r'])
     async def roll(self, ctx, modifier: Modifier = 0):
         """Roll with an optional modifier."""
-        player = ctx.message.author
+        player = ctx.author
         original_command = ctx.message.content
 
         roll = DICE_POOL.roll()
@@ -37,7 +37,7 @@ class RollCog(Cog, name = 'Rolling'):
     @command(aliases = ['rv'])
     async def rollvs(self, ctx, modifier: Optional[Modifier] = 0, opposition: int = 0):
         """Roll against static opposition."""
-        player = ctx.message.author
+        player = ctx.author
         original_command = ctx.message.content
 
         roll = DICE_POOL.roll()
