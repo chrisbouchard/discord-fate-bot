@@ -8,7 +8,7 @@ def log_level_numeric(log_level):
     return numeric_level
 
 @environ.config(prefix='DISCORD_FATE_BOT')
-class BotConfig:
+class Config:
     log_level = environ.var('INFO', converter=log_level_numeric)
     token = environ.var()
 
