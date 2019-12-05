@@ -3,7 +3,7 @@ import re
 from discord.ext.commands import BadArgument, Cog, Converter, command
 from typing import Optional
 
-from ..dice import FateDiePool
+from ..dice import Context, FateDiePool
 
 DICE_POOL = FateDiePool()
 MODIFIER_REGEX = re.compile(r'[+-]\d+')
@@ -20,13 +20,15 @@ class RollCog(Cog, name = 'Rolling'):
     """Commands for rolling dice."""
 
     @command(aliases = ['r'])
-    async def roll(self, ctx, modifier: Modifier = 0):
+    async def roll(self, ctx, modifier: Modifier = None):
         """Roll with an optional modifier."""
         player = ctx.author
         original_command = ctx.message.content
 
-        roll = DICE_POOL.roll()
-        shifts = roll.total() + modifier
+        context = Context(modifiers = (modifier, ) if modifier else ())
+
+        roll = DICE_POOL.roll(context)
+        shifts = roll.result()
 
         results_header = f'{player.mention} Results for `{original_command}`:\n'
         results_roll = f'```\n{roll}```\n'
@@ -40,8 +42,13 @@ class RollCog(Cog, name = 'Rolling'):
         player = ctx.author
         original_command = ctx.message.content
 
-        roll = DICE_POOL.roll()
-        shifts = roll.total() + modifier - opposition
+        context = Context(
+            modifiers = (modifier, ) if modifier else (),
+            opposition = opposition
+        )
+
+        roll = DICE_POOL.roll(context)
+        shifts = roll.result()
 
         results_header = f'{player.mention} Results for `{original_command}`:\n'
         results_roll = f'```\n{roll}```\n'
