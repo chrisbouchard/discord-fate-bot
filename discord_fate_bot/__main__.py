@@ -10,7 +10,7 @@ from .model import config
 bot_config = environ.to_config(config.BotConfig, os.environ)
 
 if bot_config.log_level is not None:
-    logging.basicConfig(level=bot_config.log_level)
+    logging.basicConfig(level = bot_config.log_level)
 
 bot = Bot(command_prefix = '!')
 bot.load_extension(resolve_name('.extensions.error_handling', __package__))
