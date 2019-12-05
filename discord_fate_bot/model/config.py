@@ -1,14 +1,22 @@
-import environ
-import logging
+import environ as environ_
+import os
 
-def log_level_numeric(log_level):
-    numeric_level = getattr(logging, log_level.upper(), None)
-    if not isinstance(numeric_level, int):
-        raise ValueError(f'Invalid log level: {log_level}')
-    return numeric_level
+ENV_VAR_PREFIX = 'DFB'
 
-@environ.config(prefix='DISCORD_FATE_BOT')
+@environ_.config
+class BotConfig:
+    token = environ_.var(help = 'The log-in token for the Discord bot account')
+
+@environ_.config
+class LogConfig:
+    level = environ_.var('INFO', help = 'The minimum log level')
+
+@environ_.config(prefix = ENV_VAR_PREFIX)
 class Config:
-    log_level = environ.var('INFO', converter=log_level_numeric)
-    token = environ.var()
+    bot = environ_.group(BotConfig)
+    log = environ_.group(LogConfig)
+
+
+def read(environ = os.environ):
+    return environ_.to_config(Config, environ)
 

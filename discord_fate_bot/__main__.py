@@ -1,15 +1,10 @@
 import environ
-import logging
-import os
 
-from .bot import create_bot
-from .model.config import Config
+from . import bot, logging
+from .model import config
 
-config = environ.to_config(Config, os.environ)
+config = config.read()
 
-if config.log_level is not None:
-    logging.basicConfig(level = config.log_level)
-
-bot = create_bot()
-bot.run(config.token)
+logging.setup(config.log)
+bot.run(config.bot)
 
