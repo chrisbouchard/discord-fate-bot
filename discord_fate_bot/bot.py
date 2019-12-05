@@ -1,7 +1,7 @@
 from discord.ext.commands import Bot
 from importlib.util import resolve_name
 
-from .model.config import BotConfig
+from .config import BotConfig
 
 def run(config: BotConfig):
     bot = Bot(command_prefix = '!')

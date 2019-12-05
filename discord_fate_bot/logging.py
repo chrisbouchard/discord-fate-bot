@@ -1,6 +1,6 @@
 import logging
 
-from .model.config import LogConfig
+from .config import LogConfig
 
 def setup(config: LogConfig):
     if config.level is not None:

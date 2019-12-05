@@ -3,7 +3,7 @@ import re
 from discord.ext.commands import BadArgument, Cog, Converter, command
 from typing import Optional
 
-from ..model.dice import FateDiePool
+from ..dice import FateDiePool
 
 DICE_POOL = FateDiePool()
 MODIFIER_REGEX = re.compile(r'[+-]\d+')

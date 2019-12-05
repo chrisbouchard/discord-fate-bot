@@ -1,7 +1,6 @@
 import environ
 
-from . import bot, logging
-from .model import config
+from . import bot, config, logging
 
 config = config.read()
 
