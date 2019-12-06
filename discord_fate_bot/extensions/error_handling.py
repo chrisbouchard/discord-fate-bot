@@ -11,7 +11,14 @@ class ErrorHandlingCog(Cog):
         original_command = ctx.message.content
 
         if isinstance(error, UserInputError):
-            await ctx.send(f"{player.mention} Sorry, I didn't understand: `{original_command}`")
+            message = f"{player.mention} Sorry, I didn't understand: `{original_command}`"
+
+            if hasattr(error, 'message'):
+                message += f'\n{error.message}'
+
+            message += f'\nTry `!help {ctx.invoked_with}` for more information.'
+
+            await ctx.send(message)
             return
 
         raise error

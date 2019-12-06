@@ -55,7 +55,9 @@ class RollCog(Cog, name = 'Rolling'):
 
     @command(aliases = ['rv'])
     async def rollvs(self, ctx, opponent: User, modifier: Modifier = None):
-        """Roll against another user."""
+        """Roll against another user.
+
+         Once both users have called this command, the rolls will be made."""
         channel = ctx.channel
         author = ctx.author
 
