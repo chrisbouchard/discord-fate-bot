@@ -8,27 +8,18 @@ from .util import join_as_columns
 FATE_DIE_POOL_SIZE = 4
 
 @dataclass
-class Context:
+class RollContext:
     modifiers: Sequence[int] = ()
     opposition: int = None
+
+    def is_opposed(self):
+        return self.opposition is not None
 
     def total_modifier(self):
         return sum(self.modifiers)
 
     def total_opposition(self):
         return self.opposition or 0
-
-    def __str__(self):
-        line = ''
-
-        if self.modifiers:
-            line += '  '
-            line += ' '.join(f'{modifier:+}' for modifier in self.modifiers)
-
-        if self.opposition is not None:
-            line += f'   vs  {self.opposition}'
-
-        return line
 
 @dataclass
 class DieFace:
@@ -53,7 +44,7 @@ class Die:
 @dataclass
 class Roll:
     faces: Sequence[DieFace]
-    context: Context
+    context: RollContext
 
     def total(self):
         return sum(face.value for face in self.faces) + self.context.total_modifier()
@@ -62,14 +53,27 @@ class Roll:
         return self.total() - self.context.total_opposition()
 
     def __str__(self):
-        columns = (*self.faces, f'\n{self.context}')
+        columns = (*self.faces, self._str_tag())
         return join_as_columns(columns)
+
+    def _str_tag(self):
+        tag = '\n'
+
+        if self.context.modifiers:
+            tag += ''.join(f' {modifier:+}' for modifier in self.context.modifiers)
+
+        tag += f'  =  {self.total()}'
+
+        if self.context.opposition is not None:
+            tag += f'   vs  {self.context.opposition}'
+
+        return tag
 
 @dataclass
 class DiePool:
     dice: Sequence[Die]
 
-    def roll(self, context: Context) -> Roll:
+    def roll(self, context: RollContext) -> Roll:
         return Roll(tuple(die.roll() for die in self.dice), context)
 
 
