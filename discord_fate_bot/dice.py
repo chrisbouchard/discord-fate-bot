@@ -68,13 +68,14 @@ class RollContext:
 class DieFace:
     label: str
     value: Value
+    width: int = 3
 
     def __str__(self):
-        side = '─' * len(self.label)
+        side = '─' * max(self.width, len(self.label))
         return '\n'.join((
-            f'╭─{side}─╮',
-            f'│ {self.label} │',
-            f'╰─{side}─╯'
+            f'╭{side}╮',
+            f'│{self.label:^{self.width}}│',
+            f'╰{side}╯'
         ))
 
 @dataclass
@@ -127,9 +128,9 @@ class FateDie(Die):
     def __init__(self):
         super().__init__(
             faces = (
-                DieFace(label = '−', value = Value(-1)),
+                DieFace(label = '╺━╸', value = Value(-1)),
                 DieFace(label = ' ', value = Value(0)),
-                DieFace(label = '+', value = Value(1)),
+                DieFace(label = '╺╋╸', value = Value(1)),
             )
         )
 
