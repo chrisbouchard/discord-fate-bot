@@ -1,6 +1,6 @@
 import random
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import total_ordering
 from typing import Sequence
 
@@ -8,10 +8,19 @@ from .util import join_as_columns
 
 FATE_DIE_POOL_SIZE = 4
 
+
 @dataclass
 @total_ordering
 class Value:
     raw_value: int
+    hide_plus: bool = False
+    show_space: bool = False
+
+    def no_plus(self):
+        return replace(self, hide_plus=True)
+
+    def with_space(self):
+        return replace(self, show_space=True)
 
     def __add__(self, other):
         if isinstance(other, Value):
@@ -49,9 +58,20 @@ class Value:
         return NotImplemented
 
     def __str__(self):
-        sign = '+' if self.raw_value >= 0 else '−'
-        return f'{sign}{abs(self.raw_value)}'
+        output = ''
 
+        if self.raw_value >= 0:
+            if not self.hide_plus:
+                output += '+'
+                if self.show_space:
+                    output += ' '
+        else:
+            output += '−'
+            if self.show_space:
+                output += ' '
+
+        output += str(abs(self.raw_value))
+        return output
 
 @dataclass
 class RollContext:
@@ -73,9 +93,9 @@ class DieFace:
     def __str__(self):
         side = '─' * max(self.width, len(self.label))
         return '\n'.join((
-            f'╭{side}╮',
-            f'│{self.label:^{self.width}}│',
-            f'╰{side}╯'
+            f'╭{side}╮ ',
+            f'│{self.label:^{self.width}}│ ',
+            f'╰{side}╯ '
         ))
 
 @dataclass
@@ -99,22 +119,38 @@ class Roll:
     def result(self):
         return self.total() - self.context.total_opposition()
 
-    def __str__(self):
-        columns = (*self.faces, self._str_tag())
-        return join_as_columns(columns)
+    def description(self):
+        shifts = self.result()
 
-    def _str_tag(self):
-        tag = f'\n ({self.dice_total()})'
+        if self.context.opposition is None:
+            return f'You generated **{shifts}** shifts.'
+
+        if shifts >= 3:
+            return f'You **succeeded with style** with **{shifts}** shifts!'
+        elif shifts > 0:
+            return f'You **succeeded** with **{shifts}** shifts.'
+        elif shifts < 0:
+            return f'You **failed** with **{shifts}** shifts.'
+        else:
+            return "You **tied**."
+
+    def dice_display(self):
+        return join_as_columns(self.faces)
+
+    def explanation(self):
+        explanation_str = f'You rolled  ⟦{self.dice_total().no_plus()}⟧'
 
         if self.context.modifiers:
-            tag += ''.join(f' {modifier}' for modifier in self.context.modifiers)
+            explanation_str += ''.join(f' {modifier.with_space()}' for modifier in self.context.modifiers)
 
-        tag += f'  =  {self.total()}'
+        explanation_str += f'  =  **{self.total().no_plus()}**'
 
         if self.context.opposition is not None:
-            tag += f'   vs   {self.context.opposition}'
+            explanation_str += f'   vs   {self.context.opposition.no_plus()}'
 
-        return tag
+        explanation_str += '.'
+
+        return explanation_str
 
 @dataclass
 class DiePool:

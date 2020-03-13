@@ -41,8 +41,8 @@ class RollCog(Cog, name = 'Rolling'):
     async def roll(
             self, ctx,
             modifiers: Greedy[Modifier],
-            vs: Optional[OppositionSigil],
-            opposition: Optional[Opposition]):
+            vs: OppositionSigil = None,
+            opposition: Opposition = None):
         """Roll with an optional modifier and opposition."""
         player = ctx.author
 
@@ -53,24 +53,12 @@ class RollCog(Cog, name = 'Rolling'):
 
         roll = DICE_POOL.roll(context)
 
-        results_header = f'{player.mention} Results for roll:'
-        results_roll = f'```\n{roll}```'
-        results_final = format_roll_result(roll)
+        message = f'{player.mention} \[{ctx.message.content}\] {roll.description()}\n'
+        message += f'```\n{roll.dice_display()}```\n'
+        message += f'{roll.explanation()}'
 
-        await ctx.send(f'{results_header}\n{results_roll}\n{results_final}')
+        await ctx.send(message)
 
-
-def format_roll_result(roll: Roll):
-    shifts = roll.result()
-
-    if shifts >= 3:
-        return f'You **succeeded with style** with **{shifts}** shifts!'
-    elif shifts > 0:
-        return f'You **succeeded** with **{shifts}** shifts.'
-    elif shifts < 0:
-        return f'You **failed** with **{shifts}** shifts.'
-    else:
-        return "You **tied**."
 
 def setup(bot):
     bot.add_cog(RollCog())
