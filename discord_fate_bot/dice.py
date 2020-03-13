@@ -76,10 +76,10 @@ class Value:
 @dataclass
 class RollContext:
     modifiers: Sequence[Value] = ()
-    opposition: Value = Value(0)
+    opposition: Value = None
 
     def total_modifier(self):
-        return sum(self.modifiers)
+        return sum(self.modifiers) or Value(0)
 
     def total_opposition(self):
         return self.opposition or Value(0)
@@ -141,7 +141,7 @@ class Roll:
         explanation_str = f'You rolled  \[{self.dice_total().no_plus()}\]'
 
         if self.context.modifiers:
-            explanation_str += ''.join(f' {modifier.with_space()}' for modifier in self.context.modifiers)
+            explanation_str += f' {self.context.total_modifier().with_space()}'
 
         explanation_str += f',  for a total of  {self.total().no_plus()}'
 

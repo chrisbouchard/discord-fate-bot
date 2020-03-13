@@ -31,19 +31,52 @@ class OppositionSigil(Converter):
     async def convert(self, ctx, argument):
         if argument != 'vs':
             raise BadArgument("Opposition must be numeric")
-        return None
+        return argument
 
 
 class RollCog(Cog, name = 'Rolling'):
     """Commands for rolling dice."""
 
-    @command(aliases = ['r'])
+    @command(
+        aliases = ['r'],
+        ignore_extra = False,
+        usage = '[modifier]... ["vs" opposition]'
+    )
     async def roll(
             self, ctx,
             modifiers: Greedy[Modifier],
             vs: OppositionSigil = None,
             opposition: Opposition = None):
-        """Roll with an optional modifier and opposition."""
+        """Roll with optional modifiers and opposition.
+
+        MODIFIERS
+
+          Zero or more modifiers may be given, each starting with a "+" or "-",
+          e.g., "+3" or "-1".
+
+        OPPOSITION
+
+          At most one opposition may be given. If no opposition is given, the
+          roll simply generates shifts vs 0. If opposition is given, the result
+          will be either failure, success, or success with style.
+
+        EXAMPLES
+
+          !roll
+              Roll with no modifier and no opposition.
+
+          !roll +2
+              Roll with a +2 modifier and no opposition.
+
+          !roll +1 vs 3
+              Roll with a +1 modifier and an opposition of 3.
+
+          !roll -1 +2 vs 3
+              Roll with a +1 modifier (−1 + +2) and an opposition of 3.
+        """
+        if vs is not None and opposition is None:
+            raise BadArgument("Opposition not supplied")
+
         player = ctx.author
 
         context = RollContext(
