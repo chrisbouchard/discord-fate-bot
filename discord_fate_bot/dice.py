@@ -138,15 +138,15 @@ class Roll:
         return join_as_columns(self.faces)
 
     def explanation(self):
-        explanation_str = f'You rolled  ⟦{self.dice_total().no_plus()}⟧'
+        explanation_str = f'You rolled  \[{self.dice_total().no_plus()}\]'
 
         if self.context.modifiers:
             explanation_str += ''.join(f' {modifier.with_space()}' for modifier in self.context.modifiers)
 
-        explanation_str += f'  =  **{self.total().no_plus()}**'
+        explanation_str += f',  for a total of  {self.total().no_plus()}'
 
         if self.context.opposition is not None:
-            explanation_str += f'   vs   {self.context.opposition.no_plus()}'
+            explanation_str += f'  vs  {self.context.opposition.no_plus()}'
 
         explanation_str += '.'
 
