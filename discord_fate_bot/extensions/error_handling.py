@@ -1,3 +1,5 @@
+import textwrap
+
 from discord.ext.commands import Cog, UserInputError
 
 class ErrorHandlingCog(Cog):
@@ -7,16 +9,10 @@ class ErrorHandlingCog(Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        player = ctx.author
-        original_command = ctx.message.content
-
         if isinstance(error, UserInputError):
-            message = f"{player.mention} Sorry, I didn't understand: `{original_command}`"
-
-            if hasattr(error, 'message'):
-                message += f'\n{error.message}'
-
-            message += f'\nTry `!help {ctx.invoked_with}` for more information.'
+            message = f"{ctx.author.mention} Sorry, I didn't understand:\n\n"
+            message += f"{quote(ctx.message)}\n\n"
+            message += f'{punctuate(error)} Try **!help {ctx.invoked_with}** for more information. (Feel free to DM {ctx.me.mention}.)'
 
             await ctx.send(message)
             return
@@ -26,4 +22,15 @@ class ErrorHandlingCog(Cog):
 
 def setup(bot):
     bot.add_cog(ErrorHandlingCog())
+
+
+def quote(message):
+    content = message.content
+    return textwrap.indent(content, '> ', lambda line: True)
+
+def punctuate(text):
+    text = str(text)
+    if text[-1] in '!?.':
+        return text
+    return f"{text}."
 

@@ -1,6 +1,3 @@
-import asyncio
-import re
-
 from discord.ext.commands import BadArgument, Cog, Converter, Greedy, command
 from typing import Optional
 
@@ -12,11 +9,11 @@ class Modifier(Converter):
     """A positive or negative roll modifier."""
     async def convert(self, ctx, argument):
         if argument[:1] not in ('+', '-'):
-            raise BadArgument("Modifier must have format: {+|-}VALUE")
+            raise BadArgument('A modifier must have format: {+|-}VALUE')
         try:
             return Value(int(argument))
         except ValueError:
-            raise BadArgument("Modifier must be numeric")
+            raise BadArgument('A modifier must be a number')
 
 class Opposition(Converter):
     """A numeric value."""
@@ -24,13 +21,13 @@ class Opposition(Converter):
         try:
             return Value(int(argument))
         except ValueError:
-            raise BadArgument("Opposition must be numeric")
+            raise BadArgument('Opposition must be a number')
 
 class OppositionSigil(Converter):
     """A separator."""
     async def convert(self, ctx, argument):
         if argument != 'vs':
-            raise BadArgument("Opposition must be numeric")
+            raise BadArgument('Expected "vs"')
         return argument
 
 
@@ -40,7 +37,7 @@ class RollCog(Cog, name = 'Rolling'):
     @command(
         aliases = ['r'],
         ignore_extra = False,
-        usage = '[modifier]... ["vs" opposition]'
+        usage = '[<modifier> ...] [vs <opposition>]'
     )
     async def roll(
             self, ctx,
@@ -75,7 +72,7 @@ class RollCog(Cog, name = 'Rolling'):
               Roll with a +1 modifier (−1 + +2) and an opposition of 3.
         """
         if vs is not None and opposition is None:
-            raise BadArgument("Opposition not supplied")
+            raise BadArgument('Found "vs" but no opposition')
 
         player = ctx.author
 
