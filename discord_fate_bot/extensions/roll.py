@@ -86,7 +86,7 @@ class RollCog(Cog, name = 'Rolling'):
 
         roll = DICE_POOL.roll(context)
 
-        message = f':game_die: {player.mention} \[{ctx.message.content}\] {roll.description()}\n\n'
+        message = f':game_die: {player.mention} \[{ctx.message.content}\]  {roll.description()}\n\n'
         message += f'```\n{roll.dice_display()}```\n'
         message += f'({roll.explanation()})'
 
