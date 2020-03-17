@@ -13,6 +13,7 @@ pyyaml = "*"
 [packages]
 discord-py = "*"
 environ-config = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.7"

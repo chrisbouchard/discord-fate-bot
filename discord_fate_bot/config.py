@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+
 import environ as environ_
 import os
 
@@ -18,5 +20,6 @@ class Config:
 
 
 def read(environ = os.environ):
+    load_dotenv()
     return environ_.to_config(Config, environ)
 
