@@ -9,7 +9,8 @@ from .util import join_as_columns
 FATE_DIE_POOL_SIZE = 4
 
 
-@dataclass(eq=True, order=True)
+@dataclass(eq=True, order=False)
+@total_ordering
 class Value:
     raw_value: int = field(compare=True)
     hide_plus: bool = field(default=False, compare=False)
@@ -47,6 +48,13 @@ class Value:
             return Value(other.raw_value - self.raw_value)
         elif isinstance(other, int):
             return Value(other - self.raw_value)
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Value):
+            return self.raw_value < other.raw_value
+        elif isinstance(other, int):
+            return self.raw_value < other
         return NotImplemented
 
     def __str__(self):
