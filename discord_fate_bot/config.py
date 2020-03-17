@@ -1,25 +1,25 @@
 from dotenv import load_dotenv
 
-import environ as environ_
+import environ as _environ
 import os
 
 ENV_VAR_PREFIX = 'DFB'
 
-@environ_.config
+@_environ.config
 class BotConfig:
-    token = environ_.var(help = 'The log-in token for the Discord bot account')
+    token = _environ.var(help = 'The log-in token for the Discord bot account')
 
-@environ_.config
+@_environ.config
 class LogConfig:
-    level = environ_.var('INFO', help = 'The minimum log level')
+    level = _environ.var('INFO', help = 'The minimum log level')
 
-@environ_.config(prefix = ENV_VAR_PREFIX)
+@_environ.config(prefix = ENV_VAR_PREFIX)
 class Config:
-    bot = environ_.group(BotConfig)
-    log = environ_.group(LogConfig)
+    bot = _environ.group(BotConfig)
+    log = _environ.group(LogConfig)
 
 
 def read(environ = os.environ):
     load_dotenv()
-    return environ_.to_config(Config, environ)
+    return _environ.to_config(Config, environ)
 
