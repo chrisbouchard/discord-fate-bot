@@ -5,8 +5,7 @@ FROM python:3.7-buster as build
 COPY . /app
 WORKDIR /app
 
-RUN apt-get update \
-        && apt-get install -y --no-install-recommends pipenv=11.9.0-1 \
+RUN pip install --no-cache-dir pipenv==2018.11.26 \
         && pipenv install --dev \
         && pipenv lock -r > requirements.txt \
         && pipenv run python setup.py bdist_wheel
