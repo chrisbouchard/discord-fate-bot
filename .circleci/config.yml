@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   docker: circleci/docker@1.0.0
 
-
 jobs:
   pipenv-unittest:
     description: Run Unit Tests via Pipenv
@@ -17,20 +16,19 @@ jobs:
       - store_test_results:
           path: /tmp/tests-xml-output/
 
-
 workflows:
   version: 2
-
   test-publish:
     jobs:
       - pipenv-unittest
+      - docker/hadolint
       - docker/publish:
           requires:
             - pipenv-unittest
+            - docker/hadolint
           filters:
             branches:
               only: master
           context: discord-fate-bot/publish
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
-          lint-dockerfile: true
 
