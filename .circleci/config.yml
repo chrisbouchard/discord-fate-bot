@@ -8,7 +8,7 @@ jobs:
   pipenv-unittest:
     description: Run Unit Tests via Pipenv
     docker:
-      - image: kennethreitz/pipenv
+      - image: kennethreitz/pipenv:latest
     steps:
       - checkout
       - pipenv sync
