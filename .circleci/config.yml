@@ -19,18 +19,16 @@ jobs:
 workflows:
   version: 2
 
-  tests:
+  test-publish:
     jobs:
       - pipenv-unittest
-
-  publish:
-    requires:
-      - tests
-    filters:
-      branches:
-        only: master
-    jobs:
       - docker/publish:
+          requires:
+            - pipenv-unittest
+          filters:
+            branches:
+              only: master
+          context: discord-fate-bot-publish
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           lint-dockerfile: true
 
