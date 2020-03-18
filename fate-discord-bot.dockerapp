@@ -1,0 +1,34 @@
+# This section contains your application metadata.
+# Version of the application
+version: 0.1.0
+# Name of the application
+name: discord-fate-bot
+# A short description of the application
+description: Discord bot to help play the Fate role playing game
+# List of application maintainers with name and email for each
+maintainers:
+  - name: Chris Bouchard
+    email: chris@upliftinglemma.net
+
+---
+# This section contains the Compose file that describes your application services.
+version: "3.6"
+
+services:
+  discord-fate-bot:
+    image: upliftinglemma/discord-fate-bot:latest
+    environment:
+      - DFB_BOT_TOKEN_FILE=/run/secrets/discord-fate-bot-token
+      - DFB_LOG_LEVEL=${log.level}
+    secrets:
+      - discord-fate-bot-token
+
+secrets:
+  discord-fate-bot-token:
+    external: true
+
+---
+log:
+  level: INFO
+
+# vim: set ft=yaml:
