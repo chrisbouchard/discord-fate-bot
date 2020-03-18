@@ -1,18 +1,20 @@
 # Stage 1: Environment to build binary wheel
 
-FROM kennethreitz/pipenv:latest as build
+FROM python:3.7-buster as build
 
 COPY . /app
 WORKDIR /app
 
-RUN pipenv install --dev \
+RUN apt-get update \
+        && apt-get install -y pipenv \
+        && pipenv install --dev \
         && pipenv lock -r > requirements.txt \
         && pipenv run python setup.py bdist_wheel
 
 
 # Stage 2: Environment to run bot
 
-FROM python:3.7
+FROM python:3.7-buster
 
 WORKDIR /usr/src/app
 
