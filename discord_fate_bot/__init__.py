@@ -1,10 +1,4 @@
-import environ
+from .app import DiscordFateBotApp
 
-from . import bot, config, logging
-
-def run():
-    c = config.read()
-
-    logging.setup(c.log)
-    bot.run(c.bot)
+__all__ = [DiscordFateBotApp]
 

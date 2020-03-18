@@ -1,4 +1,8 @@
-from . import run
+from . import DiscordFateBotApp
 
-run()
+def main():
+    app = DiscordFateBotApp()
+    app.run()
+
+main()
 
