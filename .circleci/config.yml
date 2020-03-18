@@ -11,9 +11,9 @@ jobs:
       - image: kennethreitz/pipenv:latest
     steps:
       - checkout
-      - pipenv sync
-      - pipenv check
-      - pipenv run python -m unittest
+      - run: pipenv sync
+      - run: pipenv check
+      - run: pipenv run python -m unittest
 
 
 workflows:
