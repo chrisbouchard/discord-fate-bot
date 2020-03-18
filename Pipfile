@@ -6,10 +6,6 @@ verify_ssl = true
 [dev-packages]
 pbr = "*"
 
-"watchdog[watchmedo]" = "*"
-argh = "*"
-pyyaml = "*"
-
 [packages]
 discord-py = "*"
 environ-config = "*"
