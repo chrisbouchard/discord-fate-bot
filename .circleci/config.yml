@@ -11,8 +11,8 @@ jobs:
       - image: kennethreitz/pipenv:latest
     steps:
       - checkout
-      - run: pipenv sync
-      - run: pipenv check --dev
+      - run: pipenv sync --dev
+      - run: pipenv check
       - run: pipenv run python -m xmlrunner discover -o /tmp/tests-xml-output/
       - store_test_results:
           path: /tmp/tests-xml-output/
