@@ -30,7 +30,7 @@ workflows:
           filters:
             branches:
               only: master
-          context: discord-fate-bot-publish
+          context: discord-fate-bot/publish
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           lint-dockerfile: true
 
