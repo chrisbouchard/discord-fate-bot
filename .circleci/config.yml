@@ -45,5 +45,6 @@ workflows:
               only: master
           context: discord-fate-bot/publish
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:latest
           tag: $CIRCLE_SHA1,latest
 
