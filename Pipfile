@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pbr = "*"
+unittest-xml-reporting = "*"
 
 [packages]
 discord-py = "*"
