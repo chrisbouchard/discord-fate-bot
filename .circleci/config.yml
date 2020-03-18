@@ -21,7 +21,8 @@ workflows:
   test-publish:
     jobs:
       - pipenv-unittest
-      - docker/hadolint
+      - docker/hadolint:
+          ignore-rules: DL3013
       - docker/publish:
           requires:
             - pipenv-unittest

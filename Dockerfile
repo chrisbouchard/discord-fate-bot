@@ -1,8 +1,8 @@
 # Stage 1: Environment to build binary wheel
 
-FROM kennethreitz/pipenv as build
+FROM kennethreitz/pipenv:latest as build
 
-ADD . /app
+COPY . /app
 WORKDIR /app
 
 RUN pipenv install --dev \
@@ -17,7 +17,7 @@ FROM python:3.7
 WORKDIR /usr/src/app
 
 COPY --from=build /app/dist/*.whl .
-RUN pip install --no-cache-dir *.whl
+RUN pip install --no-cache-dir ./*.whl
 
 CMD [ "python", "-m", "discord_fate_bot" ]
 
