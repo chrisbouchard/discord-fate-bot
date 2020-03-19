@@ -8,6 +8,7 @@ from .config import BotConfig, Config, LogConfig
 
 _BOT_EXTENSIONS = [
     '.extensions.error_handling',
+    '.extensions.lifecycle',
     '.extensions.aspect',
     '.extensions.roll'
 ]
