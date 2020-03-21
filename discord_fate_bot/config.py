@@ -1,3 +1,4 @@
+import aiofiles
 import environ as _environ  # Renaming to avoid shadowing in read(environ)
 import os
 
@@ -13,13 +14,20 @@ class BotConfig:
         help = 'The path to a file containing the log-in token (takes precedence)'
     )
 
-    def read_token(self):
+    async def read_token(self):
         """Read the token from the config, possibly from the filesystem."""
         if self.token_file is not None:
-            with open(self.token_file, 'r') as token_file:
-                return token_file.read().strip()
+            async with open(self.token_file, 'r') as token_file:
+                return (await token_file.read()).strip()
 
         return self.token
+
+@_environ.config
+class DatabaseConfig:
+    url = _environ.var(
+        'postgresql://localhost',
+        help = "URL for the database connection"
+    )
 
 @_environ.config
 class LogConfig:
@@ -28,6 +36,7 @@ class LogConfig:
 @_environ.config(prefix = 'DFB')
 class Config:
     bot = _environ.group(BotConfig)
+    database = _environ.group(DatabaseConfig)
     log = _environ.group(LogConfig)
 
     @bot.validator

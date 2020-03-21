@@ -2,6 +2,9 @@ from discord.ext.commands import Cog, command, group
 from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
+def setup(bot):
+    bot.add_cog(AspectsCog())
+
 class AspectsCog(Cog, name = 'Aspects'):
     """Commands for managing aspects on the scene."""
     aspects: Dict[int, List[str]]
@@ -70,8 +73,4 @@ class AspectsCog(Cog, name = 'Aspects'):
                 listing += f'{newline}{bold}{i + 1}. {aspect}{bold}'
 
         return await ctx.send(f'**__{title}__:**\n{listing}')
-
-
-def setup(bot):
-    bot.add_cog(AspectsCog())
 
