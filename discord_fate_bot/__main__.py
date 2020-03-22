@@ -16,5 +16,5 @@ async def main():
     async with connect_database(bot):
         await run_bot(bot)
 
-aiorun.run(main())
+aiorun.run(main(), stop_on_unhandled_errors=True)
 
