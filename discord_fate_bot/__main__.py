@@ -1,4 +1,4 @@
-import asyncio
+import aiorun
 import logging
 
 from .bot import make_bot, run_bot
@@ -16,5 +16,5 @@ async def main():
     async with connect_database(bot):
         await run_bot(bot)
 
-asyncio.run(main())
+aiorun.run(main())
 

@@ -8,10 +8,11 @@ pbr = "*"
 unittest-xml-reporting = "*"
 
 [packages]
-alembic = "*"
 aiofiles = "*"
+aiorun = "*"
+alembic = "*"
 "databases[postgresql]" = "*"
-discord-py = "*"
+discord.py = "*"
 environ-config = "*"
 
 [requires]

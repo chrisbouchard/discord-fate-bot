@@ -28,10 +28,13 @@ async def run_bot(bot: Bot):
     config = config_cog.config
     token = await config.bot.read_token()
 
+    # This code is based on the documentation for Bot.run, except it has been
+    # adapted to run *inside* the asyncio loop (so there's no need -- or
+    # ability -- to close the loop).
     try:
         await bot.start(token)
-    except KeyboardInterrupt:
-        await bot.close()
+    finally:
+        await bot.logout()
 
 
 class ConfigCog(Cog, name = 'Config'):
