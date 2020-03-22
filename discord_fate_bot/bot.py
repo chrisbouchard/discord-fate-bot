@@ -5,7 +5,7 @@ from .config import BotConfig, Config
 
 _BOT_EXTENSIONS = [
     '.extensions.error_handling',
-    '.extensions.lifecycle',
+    '.extensions.log_invite_url',
     '.extensions.aspects',
     '.extensions.rolling'
 ]

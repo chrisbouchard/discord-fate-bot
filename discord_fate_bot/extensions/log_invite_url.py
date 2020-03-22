@@ -5,11 +5,11 @@ from discord.ext.commands import Cog
 from discord.utils import oauth_url
 
 def setup(bot):
-    bot.add_cog(LifecycleCog(bot))
+    bot.add_cog(LogInviteUrlCog(bot))
 
 logger = logging.getLogger(__name__)
 
-class LifecycleCog(Cog):
+class LogInviteUrlCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
