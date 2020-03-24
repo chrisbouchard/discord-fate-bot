@@ -12,8 +12,9 @@ aiofiles = "*"
 aiorun = "*"
 alembic = "*"
 "databases[postgresql]" = "*"
-discord.py = "*"
+discord = {py = "*"}
 environ-config = "*"
+discord-fate-bot = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
