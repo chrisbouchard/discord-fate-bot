@@ -7,9 +7,7 @@ from .database import connect_database
 
 async def main():
     config = Config.from_environ()
-
-    if config.log.level is not None:
-        logging.basicConfig(level = config.log.level)
+    config.log.apply_global()
 
     bot = make_bot(config)
 
