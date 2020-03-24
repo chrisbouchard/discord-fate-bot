@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6ddd8b452b7d5c1f1eaf55a45957e4edacb3128060b74a9fbefa7312b417d61c"
+            "sha256": "d80315c10fb2b086957af78cba9c1d20efa389dc9125e1207d418d2ee42ca791"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -120,10 +120,6 @@
             ],
             "index": "pypi",
             "version": "==1.0.1"
-        },
-        "discord-fate-bot": {
-            "editable": true,
-            "path": "."
         },
         "discord.py": {
             "hashes": [
@@ -329,6 +325,10 @@
         }
     },
     "develop": {
+        "discord-fate-bot": {
+            "editable": true,
+            "path": "."
+        },
         "pbr": {
             "hashes": [
                 "sha256:139d2625547dbfa5fb0b81daebb39601c478c21956dc57e2e07b74450a8c506b",
