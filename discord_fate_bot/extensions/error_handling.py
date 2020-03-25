@@ -2,6 +2,9 @@ import textwrap
 
 from discord.ext.commands import Cog, UserInputError
 
+def setup(bot):
+    bot.add_cog(ErrorHandlingCog())
+
 class ErrorHandlingCog(Cog):
     @Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -18,11 +21,6 @@ class ErrorHandlingCog(Cog):
             return
 
         raise error
-
-
-def setup(bot):
-    bot.add_cog(ErrorHandlingCog())
-
 
 def quote(message):
     content = message.content

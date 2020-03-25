@@ -4,12 +4,18 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+discord-fate-bot = { editable = true, path = "." }
 pbr = "*"
 unittest-xml-reporting = "*"
 
 [packages]
-discord-py = "*"
+aiofiles = "*"
+aiorun = "*"
+alembic = "*"
+"databases[postgresql]" = "*"
+discord = { py = "*" }
 environ-config = "*"
 
 [requires]
 python_version = "3.7"
+

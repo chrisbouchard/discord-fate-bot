@@ -1,8 +1,18 @@
-from . import DiscordFateBotApp
+import aiorun
+import logging
 
-def main():
-    app = DiscordFateBotApp()
-    app.run()
+from .bot import make_bot, run_bot
+from .config import Config
+from .database import connect_database
 
-main()
+async def main():
+    config = Config.from_environ()
+    config.log.apply_global()
+
+    bot = make_bot(config)
+
+    async with connect_database(bot):
+        await run_bot(bot)
+
+aiorun.run(main(), stop_on_unhandled_errors=True)
 

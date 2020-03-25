@@ -4,9 +4,12 @@ from discord import Permissions
 from discord.ext.commands import Cog
 from discord.utils import oauth_url
 
+def setup(bot):
+    bot.add_cog(LogInviteUrlCog(bot))
+
 logger = logging.getLogger(__name__)
 
-class LifecycleCog(Cog):
+class LogInviteUrlCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,8 +26,4 @@ class LifecycleCog(Cog):
         url = oauth_url(self.bot.user.id, permissions)
 
         logger.info('Invite URL: %s', url)
-
-
-def setup(bot):
-    bot.add_cog(LifecycleCog(bot))
 

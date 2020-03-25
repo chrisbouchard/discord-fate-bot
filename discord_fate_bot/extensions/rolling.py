@@ -3,6 +3,9 @@ from typing import Optional
 
 from ..dice import FateDiePool, Roll, RollContext, Value
 
+def setup(bot):
+    bot.add_cog(RollingCog())
+
 DICE_POOL = FateDiePool()
 
 class Modifier(Converter):
@@ -31,7 +34,7 @@ class OppositionSigil(Converter):
         return argument
 
 
-class RollCog(Cog, name = 'Rolling'):
+class RollingCog(Cog, name = 'Rolling'):
     """Commands for rolling dice."""
 
     @command(
@@ -88,8 +91,4 @@ class RollCog(Cog, name = 'Rolling'):
         message += f'({roll.explanation()})'
 
         await ctx.send(message)
-
-
-def setup(bot):
-    bot.add_cog(RollCog())
 
