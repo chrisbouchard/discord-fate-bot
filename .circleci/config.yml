@@ -17,24 +17,6 @@ commands:
             pipenv sync --dev
 
 jobs:
-  pipenv-unittest:
-    description: Run Unit Tests via Pipenv
-    docker:
-      - image: python:3.7-buster
-    steps:
-      - checkout
-      - set-up-pipenv
-      - run:
-          name: Check for Security Vulnerabilities
-          command: |
-            pipenv check
-      - run:
-          name: Run Unit Tests
-          command: |
-            pipenv run python -m xmlrunner discover -o /tmp/tests-xml-output/
-      - store_test_results:
-          path: /tmp/tests-xml-output/
-
   pipenv-alembic:
     description: Ensure That Alembic Migrations Run
     docker:
@@ -54,18 +36,46 @@ jobs:
           command: |
             pipenv run alembic upgrade head
 
+  pipenv-check:
+    description: Check for Security Vulnerabilities
+    docker:
+      - image: python:3.7-buster
+    steps:
+      - checkout
+      - set-up-pipenv
+      - run:
+          name: Run Check
+          command: |
+            pipenv check
+
+  pipenv-unittest:
+    description: Verify that Unit Tests Pass
+    docker:
+      - image: python:3.7-buster
+    steps:
+      - checkout
+      - set-up-pipenv
+      - run:
+          name: Run Unit Tests
+          command: |
+            pipenv run python -m xmlrunner discover -o /tmp/tests-xml-output/
+      - store_test_results:
+          path: /tmp/tests-xml-output/
+
 workflows:
   version: 2
   test-publish:
     jobs:
-      - pipenv-unittest
       - pipenv-alembic
+      - pipenv-check
+      - pipenv-unittest
       - docker/hadolint:
           ignore-rules: DL3013
       - docker/publish:
           requires:
-            - pipenv-unittest
             - pipenv-alembic
+            - pipenv-check
+            - pipenv-unittest
             - docker/hadolint
           filters:
             branches:
