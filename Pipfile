@@ -13,8 +13,9 @@ aiofiles = "*"
 aiorun = "*"
 alembic = "*"
 "databases[postgresql]" = "*"
-discord = {py = "*"}
+discord = { py = "*" }
 environ-config = "*"
 
 [requires]
 python_version = "3.7"
+
