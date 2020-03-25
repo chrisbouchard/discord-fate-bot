@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from discord_fate_bot.config import Config
+from discord_fate_bot.config import MigrationConfig
 from discord_fate_bot.tables import metadata
 
 # this is the Alembic Config object, which provides
@@ -13,7 +13,7 @@ from discord_fate_bot.tables import metadata
 config = context.config
 
 # Read the database URL from the environment.
-app_config = Config.from_environ()
+app_config = MigrationConfig.from_environ()
 config.set_main_option('sqlalchemy.url', app_config.database.url)
 
 # Interpret the config file for Python logging.

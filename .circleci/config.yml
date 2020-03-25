@@ -40,7 +40,7 @@ jobs:
     docker:
       - image: python:3.7-buster
         environment:
-          DFB_DATABASE_URL: |
+          DFB_MIGRATION_DATABASE_URL: |
             postgresql://postgres@localhost/discord_fate_bot
       - image: postgres:12
         environment:

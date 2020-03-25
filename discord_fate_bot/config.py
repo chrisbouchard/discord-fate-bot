@@ -1,7 +1,6 @@
 import aiofiles
 import environ
 import logging
-import os
 
 @environ.config
 class BotConfig:
@@ -47,15 +46,21 @@ class DatabaseConfig:
 
 @environ.config
 class LogConfig:
-    level = environ.var('INFO', help = 'The minimum log level')
+    level = environ.var(None, help = 'The minimum log level')
 
     def apply_global():
         if self.level is not None:
             logging.basicConfig(level = self.level)
+
 
 @environ.config(prefix = 'DFB')
 class Config:
     bot = environ.group(BotConfig)
     database = environ.group(DatabaseConfig)
     log = environ.group(LogConfig)
+
+
+@environ.config(prefix = 'DFB_MIGRATION')
+class MigrationConfig:
+    database = environ.group(DatabaseConfig)
 
