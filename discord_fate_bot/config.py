@@ -48,7 +48,7 @@ class DatabaseConfig:
 class LogConfig:
     level = environ.var(None, help = 'The minimum log level')
 
-    def apply_global():
+    def apply_global(self):
         if self.level is not None:
             logging.basicConfig(level = self.level)
 
