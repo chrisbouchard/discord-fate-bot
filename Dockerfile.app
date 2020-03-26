@@ -22,3 +22,5 @@ RUN pip install --no-cache-dir ./*.whl
 
 CMD [ "python", "-m", "discord_fate_bot" ]
 
+# vim: set ft=dockerfile:
+

@@ -69,19 +69,43 @@ workflows:
       - pipenv-alembic
       - pipenv-check
       - pipenv-unittest
+
       - docker/hadolint:
+          name: hadolint-app
           ignore-rules: DL3013
+          dockerfile: Dockerfile.app
+
+      - docker/hadolint:
+          name: hadolint-migrations
+          dockerfile: Dockerfile.migrations
+
       - docker/publish:
+          name: publish-app
           requires:
             - pipenv-alembic
             - pipenv-check
             - pipenv-unittest
-            - docker/hadolint
+            - hadolint-app
+            - hadolint-migrations
           filters:
             branches:
               only: master
           context: discord-fate-bot/publish
+          dockerfile: Dockerfile.app
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:latest
+          tag: $CIRCLE_SHA1,latest
+
+      - docker/publish:
+          name: publish-migrations
+          requires:
+            - publish-app
+          filters:
+            branches:
+              only: master
+          context: discord-fate-bot/publish
+          dockerfile: Dockerfile.migrations
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-migrations
+          cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-migrations:latest
           tag: $CIRCLE_SHA1,latest
 
