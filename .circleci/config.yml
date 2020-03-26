@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Run Alembic Migrations
           command: |
-            pipenv run alembic upgrade head
+            pipenv run discord-fate-bot-migrate upgrade head
 
   pipenv-check:
     description: Check for Security Vulnerabilities
