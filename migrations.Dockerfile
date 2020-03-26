@@ -1,4 +1,0 @@
-FROM brainly/alembic-migrate@8c8c6be77066
-
-COPY ./alembic/versions /alembic/alembic/versions
-

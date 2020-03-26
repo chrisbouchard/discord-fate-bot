@@ -72,7 +72,6 @@ workflows:
 
       - docker/hadolint:
           ignore-rules: DL3013
-          dockerfiles: app.Dockerfile,migrations.Dockerfile
 
       - docker/publish:
           name: publish-app
@@ -85,21 +84,7 @@ workflows:
             branches:
               only: master
           context: discord-fate-bot/publish
-          dockerfile: Dockerfile.app
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:latest
-          tag: $CIRCLE_SHA1,latest
-
-      - docker/publish:
-          name: publish-migrations
-          requires:
-            - publish-app
-          filters:
-            branches:
-              only: master
-          context: discord-fate-bot/publish
-          dockerfile: Dockerfile.migrations
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-migrations
-          cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-migrations:latest
           tag: $CIRCLE_SHA1,latest
 
