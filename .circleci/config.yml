@@ -71,13 +71,8 @@ workflows:
       - pipenv-unittest
 
       - docker/hadolint:
-          name: hadolint-app
           ignore-rules: DL3013
-          dockerfile: Dockerfile.app
-
-      - docker/hadolint:
-          name: hadolint-migrations
-          dockerfile: Dockerfile.migrations
+          dockerfiles: app.Dockerfile,migrations.Dockerfile
 
       - docker/publish:
           name: publish-app
@@ -85,8 +80,7 @@ workflows:
             - pipenv-alembic
             - pipenv-check
             - pipenv-unittest
-            - hadolint-app
-            - hadolint-migrations
+            - docker/hadolint
           filters:
             branches:
               only: master
