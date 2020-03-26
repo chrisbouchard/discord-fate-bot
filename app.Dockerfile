@@ -6,7 +6,7 @@ COPY . /app
 WORKDIR /app
 
 RUN pip install --no-cache-dir pipenv==2018.11.26 \
-        && pipenv install --dev \
+        && pipenv sync --dev \
         && pipenv lock -r > requirements.txt \
         && pipenv run python setup.py bdist_wheel
 
