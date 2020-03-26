@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Run Alembic Migrations
           command: |
-            pipenv run alembic upgrade head
+            pipenv run discord-fate-bot-migrate upgrade head
 
   pipenv-check:
     description: Check for Security Vulnerabilities
@@ -69,9 +69,12 @@ workflows:
       - pipenv-alembic
       - pipenv-check
       - pipenv-unittest
+
       - docker/hadolint:
           ignore-rules: DL3013
+
       - docker/publish:
+          name: publish-app
           requires:
             - pipenv-alembic
             - pipenv-check
