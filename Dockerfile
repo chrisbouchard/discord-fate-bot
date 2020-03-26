@@ -20,7 +20,5 @@ WORKDIR /usr/src/app
 COPY --from=build /app/dist/*.whl .
 RUN pip install --no-cache-dir ./*.whl
 
-COPY alembic.ini .
-
 CMD [ "discord-fate-bot" ]
 
