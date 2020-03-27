@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from discord_fate_bot.config import MigrationConfig
+from discord_fate_bot.logging import configure_logging
 from discord_fate_bot.tables import metadata
 
 # this is the Alembic Config object, which provides
@@ -16,7 +17,7 @@ config = context.config
 app_config = MigrationConfig.from_environ()
 config.set_main_option('sqlalchemy.url', app_config.database.url)
 
-configure_logging(app_config.log)
+configure_logging(app_config)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
