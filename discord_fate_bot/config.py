@@ -1,9 +1,8 @@
 import aiofiles
 import environ
-import logging
 
 @environ.config
-class BotConfig:
+class BotGroup:
     token = environ.var(
         None,
         help = (
@@ -41,26 +40,22 @@ class BotConfig:
         return self.token
 
 @environ.config
-class DatabaseConfig:
+class DatabaseGroup:
     url = environ.var(help = "URL for the database connection")
 
 @environ.config
-class LogConfig:
-    level = environ.var(None, help = 'The minimum log level')
-
-    def apply_global(self):
-        if self.level is not None:
-            logging.basicConfig(level = self.level)
+class LogGroup:
+    config_file = environ.var(None, help = 'The path to a configuration file for Python logging')
 
 
 @environ.config(prefix = 'DFB')
 class Config:
-    bot = environ.group(BotConfig)
-    database = environ.group(DatabaseConfig)
-    log = environ.group(LogConfig)
+    bot = environ.group(BotGroup)
+    database = environ.group(DatabaseGroup)
+    log = environ.group(LogGroup)
 
-
-@environ.config(prefix = 'DFB_MIGRATION')
+@environ.config(prefix = 'DFB')
 class MigrationConfig:
-    database = environ.group(DatabaseConfig)
+    database = environ.group(DatabaseGroup)
+    log = environ.group(LogGroup)
 

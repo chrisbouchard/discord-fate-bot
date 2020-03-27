@@ -16,22 +16,11 @@ config = context.config
 app_config = MigrationConfig.from_environ()
 config.set_main_option('sqlalchemy.url', app_config.database.url)
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-# TODO: Should we use the logging config from the environment?
-fileConfig(config.config_file_name)
+configure_logging(app_config.log)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-# TODO: Set to my app's metadata once I have some.
 target_metadata = metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline():

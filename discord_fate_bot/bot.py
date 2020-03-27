@@ -1,7 +1,7 @@
 from discord.ext.commands import Bot, Cog
 from importlib.util import resolve_name
 
-from .config import BotConfig, Config
+from .config import Config
 
 _BOT_EXTENSIONS = [
     '.extensions.error_handling',
