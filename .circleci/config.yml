@@ -17,25 +17,6 @@ commands:
             pipenv sync --dev
 
 jobs:
-  pipenv-alembic:
-    description: Ensure That Alembic Migrations Run
-    docker:
-      - image: python:3.7-buster
-        environment:
-          DFB_DATABASE_URL: |
-            postgresql://postgres@localhost/discord_fate_bot
-      - image: postgres:12
-        environment:
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: discord_fate_bot
-    steps:
-      - checkout
-      - set-up-pipenv
-      - run:
-          name: Run Alembic Migrations
-          command: |
-            pipenv run discord-fate-bot-migrate upgrade head
-
   pipenv-check:
     description: Check for Security Vulnerabilities
     docker:

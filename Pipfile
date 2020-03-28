@@ -11,9 +11,9 @@ unittest-xml-reporting = "*"
 [packages]
 aiofiles = "*"
 aiorun = "*"
-dacite = "*"
 discord = { py = "*" }
 environ-config = "*"
+mashumaro = "*"
 motor = "*"
 
 [requires]

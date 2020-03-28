@@ -40,22 +40,17 @@ class BotGroup:
         return self.token
 
 @environ.config
-class DatabaseGroup:
-    url = environ.var(help = "URL for the database connection")
-
-@environ.config
 class LogGroup:
     config_file = environ.var(None, help = 'The path to a configuration file for Python logging')
+
+@environ.config
+class MongoGroup:
+    url = environ.var(help = "URL for the MongoDB connection")
 
 
 @environ.config(prefix = 'DFB')
 class Config:
     bot = environ.group(BotGroup)
-    database = environ.group(DatabaseGroup)
     log = environ.group(LogGroup)
-
-@environ.config(prefix = 'DFB')
-class MigrationConfig:
-    database = environ.group(DatabaseGroup)
-    log = environ.group(LogGroup)
+    mongo = environ.group(MongoGroup)
 

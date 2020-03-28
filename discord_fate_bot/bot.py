@@ -1,5 +1,6 @@
 from discord.ext.commands import Bot, Cog
 from importlib.util import resolve_name
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from .config import Config
 
@@ -10,10 +11,10 @@ _BOT_EXTENSIONS = [
     '.extensions.rolling'
 ]
 
-def make_bot(config: Config) -> Bot:
+def make_bot(config: Config, database: AsyncIOMotorDatabase) -> Bot:
     bot = Bot(command_prefix = '!')
 
-    bot.add_cog(ConfigCog(config))
+    bot.add_cog(AppCog(config, database))
 
     for extension in _BOT_EXTENSIONS:
         # The load_extension method expects an "absolute" package name, but we
@@ -24,8 +25,8 @@ def make_bot(config: Config) -> Bot:
     return bot
 
 async def run_bot(bot: Bot):
-    config_cog = bot.get_cog('Config')
-    config = config_cog.config
+    app_cog = bot.get_cog('App')
+    config = app_cog.config
     token = await config.bot.read_token()
 
     # This code is based on the documentation for Bot.run, except it has been
@@ -37,9 +38,11 @@ async def run_bot(bot: Bot):
         await bot.logout()
 
 
-class ConfigCog(Cog, name = 'Config'):
+class AppCog(Cog, name = 'App'):
     config: Config
+    database: AsyncIOMotorDatabase
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, database: AsyncIOMotorDatabase):
         self.config = config
+        self.database = database
 
