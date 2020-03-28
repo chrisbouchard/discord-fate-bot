@@ -14,9 +14,8 @@ def main():
 
     logger.info('Starting bot...')
 
-    database = get_database(config)
-
     async def _main():
+        database = await get_database(config)
         bot = make_bot(config, database)
         await run_bot(bot)
 

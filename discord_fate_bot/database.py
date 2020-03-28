@@ -8,10 +8,19 @@ from typing import Dict
 
 from .config import Config
 
-def get_database(config: Config) -> AsyncIOMotorDatabase:
+async def get_database(config: Config) -> AsyncIOMotorDatabase:
     connection_url = config.mongo.url
     client = AsyncIOMotorClient(connection_url)
-    return client.discord_fate_bot
+    database = client.discord_fate_bot
+
+    # TODO: We should probably do this somewhere more convenient.
+    await database.scenes.create_index(
+        'channel_id',
+        name='ix__scenes__channel_id',
+        unique=True,
+    )
+
+    return database
 
 
 class SerializableObjectId(SerializationStrategy):
