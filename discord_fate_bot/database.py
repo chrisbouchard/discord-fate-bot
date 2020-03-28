@@ -30,8 +30,18 @@ class SerializableObjectId(SerializationStrategy):
     def _deserialize(self, value: ObjectId) -> ObjectId:
         return value
 
+class SubDocument(ABC, DataClassDictMixin):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        annotations_dict = getattr(cls, '__annotations__', {})
+
+        for attr in annotations_dict:
+            if attr == ObjectId:
+                annotations_dict[attr] = SerializableObjectId()
+
 @dataclass
-class Document(ABC, DataClassDictMixin):
+class Document(SubDocument):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
 
@@ -51,14 +61,13 @@ class Document(ABC, DataClassDictMixin):
             version = data.get('_v', None)
             if version != current_version:
                 return cls.from_old_dict(data, version)
-            return orig_from_dict(cls, data, *args, **kwargs)
+            return orig_from_dict(data, *args, **kwargs)
+
+        to_dict.__doc__ = orig_to_dict.__doc__
+        from_dict.__doc__ = orig_from_dict.__doc__
 
         setattr(cls, 'to_dict', to_dict)
         setattr(cls, 'from_dict', from_dict)
-
-        for attr in cls.__annotations__:
-            if attr == ObjectId:
-                cls.__annotations__[attr] = SerializableObjectId()
 
     @classmethod
     def from_old_dict(cls, version):

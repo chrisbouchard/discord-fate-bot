@@ -3,20 +3,42 @@ from dataclasses import dataclass, field, replace
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from typing import Dict, List, Optional
 
-from .database import Document
+from .database import Document, SubDocument
 
 @dataclass
-class SceneAspect
-    id: int
+class SceneAspect(SubDocument):
     name: str
 
 @dataclass
 class Scene(Document, version=1):
     channel_id: int
-    description: str = None
-    aspects: List[SceneAspect] = field(default_factory=list)
+    message_ids: Set[int] = field(default_factory=set)
+    description: Optional[str] = None
+    aspects: Dict[str, SceneAspect] = field(default_factory=dict)
     next_aspect_id: int = 1
-    revision: int = 0
+
+    def add_aspect(self, aspect: SceneAspect):
+        self.aspects[str(self.next_aspect_id)] = aspect
+        self.next_aspect_id += 1
+
+    def get_aspect(self, aspect_id: int):
+        return self.aspects[str(aspect_id)]
+
+    def remove_aspect(self, aspect_id: int):
+        del self.aspects[str(aspect_id)]
+
+    def __str__(self):
+        description = self.description or 'Current Scene'
+
+        if self.aspects:
+            aspects_str = '\n'.join(
+                f'    • {aspect.name} [{id}]'
+                for id, aspect in self.aspects.items()
+            )
+        else:
+            aspects_str = '    • _No aspects. Add some with !aspect._'
+
+        return f':clapper:  __**{description}**__\n{aspects_str}'
 
 class SceneDao:
     database: AsyncIOMotorDatabase
@@ -26,14 +48,21 @@ class SceneDao:
         self.database = database
         self.scenes = database.scenes
 
-    async def find_by_channel_id(channel_id: int) -> Optional[Scene]:
+    async def find(self, channel_id: int) -> Optional[Scene]:
         scene_dict = await self.scenes.find_one({'channel_id': channel_id})
+
+        if scene_dict is None:
+            return None
+
         return Scene.from_dict(scene_dict)
 
-    async def save_scene(scene: Scene):
+    async def remove(self, channel_id: int):
+        await self.scenes.delete_one({'channel_id: channel_id'})
+
+    async def save(self, scene: Scene):
         await self.scenes.replace_one(
-            {'channel_id': channel_id},
-            scene,
+            {'channel_id': scene.channel_id},
+            scene.to_dict(),
             upsert=True
         )
 
