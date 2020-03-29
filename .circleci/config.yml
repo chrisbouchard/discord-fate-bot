@@ -47,7 +47,6 @@ workflows:
   version: 2
   test-publish:
     jobs:
-      - pipenv-alembic
       - pipenv-check
       - pipenv-unittest
 
