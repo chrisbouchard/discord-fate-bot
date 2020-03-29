@@ -8,7 +8,7 @@ _BOT_EXTENSIONS = [
     '.extensions.error_handling',
     '.extensions.log_invite_url',
     '.extensions.rolling',
-    '.extensions.scenes',
+    '.extensions.scene_management',
 ]
 
 class DiscordFateBot(Bot):

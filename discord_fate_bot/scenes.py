@@ -1,7 +1,7 @@
 from bson.objectid import ObjectId
 from dataclasses import dataclass, field, replace
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
-from typing import Dict, List, Optional
+from typing import Dict, Optional, Set
 
 from .database import Document, SubDocument
 
@@ -32,11 +32,11 @@ class Scene(Document, version=1):
 
         if self.aspects:
             aspects_str = '\n'.join(
-                f'    • {aspect.name} [{id}]'
+                f'    •  {aspect.name} [{id}]'
                 for id, aspect in self.aspects.items()
             )
         else:
-            aspects_str = '    • _No aspects. Add some with !aspect._'
+            aspects_str = '    •  _No aspects. Add some with !aspect._'
 
         return f':clapper:  __**{description}**__\n{aspects_str}'
 
@@ -57,7 +57,7 @@ class SceneDao:
         return Scene.from_dict(scene_dict)
 
     async def remove(self, channel_id: int):
-        await self.scenes.delete_one({'channel_id: channel_id'})
+        await self.scenes.delete_one({'channel_id': channel_id})
 
     async def save(self, scene: Scene):
         await self.scenes.replace_one(

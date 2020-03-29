@@ -9,7 +9,7 @@ from ..scenes import Scene, SceneAspect, SceneDao
 def setup(bot):
     if not isinstance(bot, DiscordFateBot):
         raise TypeError('Argument bot must be an instance of DiscordFateBot')
-    bot.add_cog(ScenesCog(bot))
+    bot.add_cog(SceneManagementCog(bot))
 
 
 class AspectName(Converter):
@@ -19,7 +19,7 @@ class AspectName(Converter):
         return str(name)
 
 
-class ScenesCog(Cog, name='Scenes'):
+class SceneManagementCog(Cog, name='Scene Management'):
     """Commands for managing scenes and scene aspects."""
 
     bot: DiscordFateBot
@@ -35,7 +35,7 @@ class ScenesCog(Cog, name='Scenes'):
         pass
 
     @scene.command()
-    async def new(self, ctx, *, description: str):
+    async def new(self, ctx, *, description: str = None):
         """Create a new scene (replacing any existing scene)"""
         channel_id = ctx.channel.id
         existing_scene = await self.scene_dao.find(channel_id)
@@ -56,6 +56,7 @@ class ScenesCog(Cog, name='Scenes'):
         channel_id = ctx.channel.id
         scene = await self._find_scene_or_die(channel_id)
         await self._delete_scene_and_unpin_message(ctx, scene)
+        await self._react_ok(ctx)
 
 
     @group(aliases=['a'], invoke_without_command=True)
@@ -70,8 +71,7 @@ class ScenesCog(Cog, name='Scenes'):
 
         scene.add_aspect(SceneAspect(name=name))
         await self._save_scene_and_update_message(ctx, scene)
-
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        await self._react_ok(ctx)
 
     @aspect.command(aliases=['-'])
     async def remove(self, ctx, aspect_ids: Greedy[int]):
@@ -81,9 +81,9 @@ class ScenesCog(Cog, name='Scenes'):
 
         for aspect_id in aspect_ids:
             scene.remove_aspect(aspect_id)
-        await self._save_scene_and_update_message(ctx, scene)
 
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        await self._save_scene_and_update_message(ctx, scene)
+        await self._react_ok(ctx)
 
     @aspect.command()
     async def modify(self, ctx, aspect_id: int, *, name: AspectName):
@@ -97,12 +97,11 @@ class ScenesCog(Cog, name='Scenes'):
 
         aspect.name = name
         await self._save_scene_and_update_message(ctx, scene)
-
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        await self._react_ok(ctx)
 
 
     async def _delete_scene_and_unpin_message(self, ctx, scene):
-        self.scene_dao.remove(scene.channel_id)
+        await self.scene_dao.remove(scene.channel_id)
 
         for message_id in scene.message_ids:
             try:
@@ -121,6 +120,9 @@ class ScenesCog(Cog, name='Scenes'):
 
         return scene
 
+    async def _react_ok(self, ctx):
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+
     async def _save_scene_and_update_message(self, ctx, scene):
         await self.scene_dao.save(scene)
 
@@ -129,9 +131,7 @@ class ScenesCog(Cog, name='Scenes'):
 
         for message_id in copied_message_ids:
             try:
-                existing_message = await ctx.fetch_message(
-                    scene.message_id
-                )
+                existing_message = await ctx.fetch_message(message_id)
                 await existing_message.edit(content=scene)
 
                 edited_any = True
