@@ -56,7 +56,6 @@ workflows:
       - docker/publish:
           name: publish-app
           requires:
-            - pipenv-alembic
             - pipenv-check
             - pipenv-unittest
             - docker/hadolint
