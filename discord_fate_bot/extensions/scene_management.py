@@ -1,10 +1,14 @@
+import logging
+
 from discord import NotFound
 from discord.ext.commands import Bot, Cog, Converter, Greedy, command, group
 from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
 from ..bot import DiscordFateBot
-from ..scenes import Scene, SceneAspect, SceneDao
+from ..scenes import NoCurrentSceneError, Scene, SceneAspect, SceneDao
+
+logger = logging.getLogger(__name__)
 
 def setup(bot):
     if not isinstance(bot, DiscordFateBot):
@@ -18,6 +22,25 @@ class AspectName(Converter):
             raise BadArgument('An aspect must have a name')
         return str(name)
 
+class AspectTag(Converter):
+    async def convert(self, ctx, tag):
+        split = tag.split('=', maxsplit=1)
+        key = split[0]
+
+        try:
+            value = split[1]
+        except IndexError:
+            value = None
+
+        if key == 'boost':
+            return (key, True)
+        elif key == 'invokes':
+            if value is None:
+                raise BadArgument('Expected: invokes=COUNT')
+            return (key, int(value))
+
+        raise BadArgument(f'Unrecognized tag key: {key}')
+
 
 class SceneManagementCog(Cog, name='Scene Management'):
     """Commands for managing scenes and scene aspects."""
@@ -30,18 +53,16 @@ class SceneManagementCog(Cog, name='Scene Management'):
         self.scene_dao = SceneDao(bot.database)
 
 
-    @group(aliases=['s'], invoke_without_command=True)
-    async def scene(self, ctx):
-        pass
-
-    @scene.command()
-    async def new(self, ctx, *, description: str = None):
+    @group(invoke_without_command=True)
+    async def scene(self, ctx, *, description: str = None):
         """Create a new scene (replacing any existing scene)"""
         channel_id = ctx.channel.id
-        existing_scene = await self.scene_dao.find(channel_id)
 
-        if existing_scene is not None:
+        try:
+            existing_scene = await self.scene_dao.find(channel_id)
             await self._delete_scene_and_unpin_message(ctx, existing_scene)
+        except NoCurrentSceneError:
+            pass
 
         new_scene = Scene(
             channel_id=channel_id,
@@ -50,34 +71,36 @@ class SceneManagementCog(Cog, name='Scene Management'):
 
         await self._save_scene_and_update_message(ctx, new_scene)
 
-    @scene.command()
-    async def end(self, ctx):
+    @scene.command(name='end')
+    async def scene_end(self, ctx):
         """End the existing scene"""
         channel_id = ctx.channel.id
-        scene = await self._find_scene_or_die(channel_id)
+        scene = await self.scene_dao.find(channel_id)
         await self._delete_scene_and_unpin_message(ctx, scene)
         await self._react_ok(ctx)
 
 
-    @group(aliases=['a'], invoke_without_command=True)
-    async def aspect(self, ctx):
-        pass
-
-    @aspect.command(aliases=['+'])
-    async def add(self, ctx, *, name: AspectName):
+    @group(invoke_without_command=True)
+    async def aspect(self, ctx, tags: Greedy[AspectTag], *, name: AspectName):
         """Create a new aspect in the scene"""
         channel_id = ctx.channel.id
-        scene = await self._find_scene_or_die(channel_id)
+        scene = await self.scene_dao.find(channel_id)
 
-        scene.add_aspect(SceneAspect(name=name))
+        # TODO: Do some error checking (negative invokes, boost without
+        # invokes, etc.)
+        tags_dict = dict(tags)
+
+        new_aspect = SceneAspect(name=name, **tags_dict)
+
+        scene.add_aspect(new_aspect)
         await self._save_scene_and_update_message(ctx, scene)
         await self._react_ok(ctx)
 
-    @aspect.command(aliases=['-'])
-    async def remove(self, ctx, aspect_ids: Greedy[int]):
+    @aspect.command(name='remove', aliases=['rem'])
+    async def aspect_remove(self, ctx, aspect_ids: Greedy[int]):
         """Remove an aspect from the scene"""
         channel_id = ctx.channel.id
-        scene = await self._find_scene_or_die(channel_id)
+        scene = await self.scene_dao.find(channel_id)
 
         for aspect_id in aspect_ids:
             scene.remove_aspect(aspect_id)
@@ -85,11 +108,11 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await self._save_scene_and_update_message(ctx, scene)
         await self._react_ok(ctx)
 
-    @aspect.command()
-    async def modify(self, ctx, aspect_id: int, *, name: AspectName):
+    @aspect.command(name='modify', aliases=['mod'])
+    async def aspect_modify(self, ctx, aspect_id: int, *, name: AspectName):
         """Modify an existing aspect"""
         channel_id = ctx.channel.id
-        scene = await self._find_scene_or_die(channel_id)
+        scene = await self.scene_dao.find(channel_id)
         aspect = scene.get_aspect(aspect_id)
 
         if aspect is None:
@@ -110,15 +133,6 @@ class SceneManagementCog(Cog, name='Scene Management'):
             except NotFound:
                 # That's ok, if it doesn't exist we just won't unpin it.
                 pass
-
-    async def _find_scene_or_die(self, channel_id):
-        scene = await self.scene_dao.find(channel_id)
-
-        if scene is None:
-            # TODO: Raise something better to send an error message
-            raise RuntimeError('No current scene for this channel')
-
-        return scene
 
     async def _react_ok(self, ctx):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
