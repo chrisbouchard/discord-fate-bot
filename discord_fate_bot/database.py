@@ -9,8 +9,9 @@ from typing import Dict
 from .config import Config
 
 async def get_database(config: Config) -> AsyncIOMotorDatabase:
-    connection_url = config.mongo.url
-    client = AsyncIOMotorClient(connection_url)
+    connection_url = config.mongo.connection_url
+    password = await config.mongo.read_password()
+    client = AsyncIOMotorClient(connection_url, password=password)
     database = client.discord_fate_bot
 
     # TODO: We should probably do this somewhere more convenient.
