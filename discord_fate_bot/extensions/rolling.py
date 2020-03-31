@@ -37,11 +37,7 @@ class OppositionSigil(Converter):
 class RollingCog(Cog, name = 'Rolling'):
     """Commands for rolling dice."""
 
-    @command(
-        aliases = ['r'],
-        ignore_extra = False,
-        usage = '[<modifier> ...] [vs <opposition>]'
-    )
+    @command(aliases = ['r'], ignore_extra = False)
     async def roll(
             self, ctx,
             modifiers: Greedy[Modifier],

@@ -11,10 +11,10 @@ unittest-xml-reporting = "*"
 [packages]
 aiofiles = "*"
 aiorun = "*"
-alembic = "*"
-"databases[postgresql]" = "*"
 discord = { py = "*" }
 environ-config = "*"
+mashumaro = "*"
+motor = "*"
 
 [requires]
 python_version = "3.7"
