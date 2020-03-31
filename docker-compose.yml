@@ -15,7 +15,7 @@ services:
       DFB_MONGO_CONNECTION_URL: mongodb://root@mongo:27017
       DFB_MONGO_PASSWORD_FILE: /run/secrets/mongo-password
     networks:
-      - discord-fate-bot
+      - internal
     secrets:
       - source: discord-fate-bot-mongo-password
         target: mongo-password
@@ -33,7 +33,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo-password
     networks:
-      - discord-fate-bot
+      - internal
     secrets:
       - source: discord-fate-bot-mongo-password
         target: mongo-password
@@ -43,7 +43,7 @@ services:
         target: /data/db
 
 networks:
-  discord-fate-bot:
+  internal:
     driver: overlay
 
 secrets:
