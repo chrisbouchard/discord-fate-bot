@@ -19,10 +19,8 @@ services:
     secrets:
       - source: discord-fate-bot-mongo-password
         target: mongo-password
-        mode: 0400
       - source: discord-fate-bot-token
         target: token
-        mode: 0400
 
   mongo:
     image: mongo:latest
@@ -39,7 +37,6 @@ services:
     secrets:
       - source: discord-fate-bot-mongo-password
         target: mongo-password
-        mode: 0400
     volumes:
       - type: volume
         source: discord-fate-bot-mongo-data
