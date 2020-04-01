@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 discord-fate-bot = { editable = true, path = "." }
 pbr = "*"
+twine = "*"
 unittest-xml-reporting = "*"
 
 [packages]
