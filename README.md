@@ -64,8 +64,31 @@ it).
 ### Future Commands
 
 I plan to add commands to manage a turn order, and possibly to track fate
-points. Beyond that, we may add facilities to track PCs and NPCs, though
-Discord text channels may not be the most convenient interface to manage those.
+points. Beyond that, I may add facilities to track PCs and NPCs, though Discord
+text channels may not be the most convenient interface to manage those.
+
+
+## Inviting the Bot
+
+There isn't currently a public instance of this bot available for invite. If
+you host your own copy, the bot will log an invite URL when it connects to
+Discord. Currently, the bot will ask for the following Discord permissions.
+
+* Add reactions
+    * To leave a :+1: once it has processed a message.
+* Manage messages
+    * To pin and unpin the scene message.
+* Read message history
+    * Not currently used, but I have a half-thought that there could be a
+      feature to recover scenes from message history if the database is
+      out-of-sync with the channel.
+* Read messages
+    * To read commands.
+* Send messages
+    * To reply with results.
+
+This list may grow and change while the bot is in development, but I'll try to
+freeze it once I release a stable public version.
 
 
 ## Installing
@@ -115,10 +138,10 @@ The bot looks for the following environment variables on start-up.
 [python-logging-config-file-format]: https://docs.python.org/3/library/logging.config.html#configuration-file-format
 
 **Note:** For variables that have a `*_FILE` pair, the direct version is
-provided as a convenience, e.g., for development. We subscribe to the school of
+provided as a convenience, e.g., for development. I subscribe to the school of
 thought that it's best not to store production secrets in environment variables
 if at all avoidable. Our Docker Stack definition uses Secrets to share the
-token and Mongo password into the services.
+Discord token and Mongo password into the services.
 
 
 ## Architecture
