@@ -115,10 +115,10 @@ The bot looks for the following environment variables on start-up.
 [python-logging-config-file-format]: https://docs.python.org/3/library/logging.config.html#configuration-file-format
 
 **Note:** For variables that have a `*_FILE` pair, the direct version is
-provided as a convenience, e.g., for development. It is discouraged to put
-production secrets in environment variables if at all avoidable. Our Docker
-Stack definition uses Secrets to share the token and Mongo password into the
-services.
+provided as a convenience, e.g., for development. We subscribe to the school of
+thought that it's best not to store production secrets in environment variables
+if at all avoidable. Our Docker Stack definition uses Secrets to share the
+token and Mongo password into the services.
 
 
 ## Architecture
