@@ -2,8 +2,13 @@
 
 A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
+[![CircleCI][circleci-dfb-svg]][circleci-dfb]
+
 [discordapp]: https://discordapp.com/
 [fate-rpg]: https://www.evilhat.com/home/fate-core/
+
+[circleci-dfb]: https://circleci.com/gh/chrisbouchard/discord-fate-bot
+[circleci-dfb-svg]: https://circleci.com/gh/chrisbouchard/discord-fate-bot.svg?style=svg
 
 
 ## Commands
@@ -94,12 +99,12 @@ freeze it once I release a stable public version.
 ## Installing
 
 There project is available on Docker Hub at
-[chrisbouchard/discord-fate-bot][docker-discord-fate-bot]. Images are
-automatically built and published based on our `Dockerfile`. There is also a
-`docker-compose.yml` file to deploy the app in Docker Swarm as a Stack,
-including a Mongo DB service.
+[chrisbouchard/discord-fate-bot][docker-dfb]. Images are automatically built
+and published based on our `Dockerfile`. There is also a `docker-compose.yml`
+file to deploy the app in Docker Swarm as a Stack, including a Mongo DB
+service.
 
-[docker-discord-fate-bot]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
+[docker-dfb]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
 
 ### Installing in Docker Swarm as a Stack
 
@@ -126,8 +131,8 @@ The bot looks for the following environment variables on start-up.
   authentication token.
     * Mutually exclusive with `DFB_BOT_TOKEN`.
 * `DFB_LOG_CONFIG_FILE` &mdash; _(Optional)_ The path to a Python log config
-  file. See the [Python documentation][python-logging-config-file-format] for a
-  description of the file format.
+  file. See the [Python documentation][python-logging-config] for a description
+  of the file format.
 * `DFB_MONGO_CONNECTION_URL` &mdash; The MongoDB connection URL.
 * `DFB_MONGO_PASSWORD` &mdash; The password for the Mongo DB connection.
     * Mutually exclusive with `DFB_MONGO_PASSWORD_FILE`.
@@ -135,7 +140,7 @@ The bot looks for the following environment variables on start-up.
   password for the Mongo DB connection.
     * Mutually exclusive with `DFB_MONGO_PASSWORD`.
 
-[python-logging-config-file-format]: https://docs.python.org/3/library/logging.config.html#configuration-file-format
+[python-logging-config]: https://docs.python.org/3/library/logging.config.html#configuration-file-format
 
 **Note:** For variables that have a `*_FILE` pair, the direct version is
 provided as a convenience, e.g., for development. I subscribe to the school of
