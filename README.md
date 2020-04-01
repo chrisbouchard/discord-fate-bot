@@ -1,6 +1,8 @@
 # Discord Fate Bot
 
 [![CircleCI][circleci-dfb-svg]][circleci-dfb]
+[![PyPI Version][shieldsio-pypi-dfb]][pypi-dfb]
+[![PyPI Python][shieldsio-python-dfb]][pypi-dfb]
 
 A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
@@ -9,6 +11,9 @@ A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
 [circleci-dfb]: https://circleci.com/gh/chrisbouchard/discord-fate-bot
 [circleci-dfb-svg]: https://circleci.com/gh/chrisbouchard/discord-fate-bot.svg?style=svg
+[pypi-dfb]: https://pypi.org/project/discord-fate-bot/
+[shieldsio-pypi-dfb]: https://img.shields.io/pypi/v/discord-fate-bot
+[shieldsio-python-dfb]: https://img.shields.io/pypi/pyversions/discord-fate-bot
 
 
 ## Commands
