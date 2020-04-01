@@ -56,9 +56,12 @@ it).
   Tags may be included, separated by spaces. After tags, the rest of the line
   will be used the aspect name.
     * `boost` &mdash; Tag this aspect as a boost, which means it automatically
-      disappears when it runs out of invokes.
+      disappears when it runs out of invokes. **TODO:** A boost should
+      implicitly add one free invoke if the `invokes` tag is not specified.
     * `invokes=COUNT` &mdash; Tag this aspect with some number of free
       invokes attached.
+    * Example: `!aspect Darkness of night`
+    * Example: `!aspect boost invokes=2 Really awesome aspect name`
 * `!aspect remove ID...` &mdash; Remove one or more aspects from the scene.
 * `!aspect modify ID NAME` &mdash; Rename an existing aspect. The rest of the
   line will be used as the new aspect name.
