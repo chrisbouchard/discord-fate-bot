@@ -1,8 +1,8 @@
 # Discord Fate Bot
 
-A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
-
 [![CircleCI][circleci-dfb-svg]][circleci-dfb]
+
+A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
 [discordapp]: https://discordapp.com/
 [fate-rpg]: https://www.evilhat.com/home/fate-core/
