@@ -21,8 +21,8 @@ A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
 ## Commands
 
-Once this bot is invited to a server, it will listen in text channels for
-commands and reply. All commands start with `!`.
+Once Discord Fate Bot is invited to a server, it will listen in text channels
+for commands and reply. All commands start with `!`.
 
 ### `!roll`
 
@@ -86,9 +86,10 @@ text channels may not be the most convenient interface to manage those.
 
 ## Inviting the Bot
 
-There isn't currently a public instance of this bot available for invite. If
-you host your own copy, the bot will log an invite URL when it connects to
-Discord. Currently, the bot will ask for the following Discord permissions.
+There isn't currently a public instance of Discord Fate Bot available for
+invite. If you host your own copy, the bot will log an invite URL when it
+connects to Discord. Currently, the bot will ask for the following Discord
+permissions.
 
 * Add reactions
     * To leave a :+1: once it has processed a message.
@@ -109,11 +110,10 @@ freeze it once I release a stable public version.
 
 ## Installing
 
-There project is available on Docker Hub at
-[chrisbouchard/discord-fate-bot][docker-dfb]. Images are automatically built
-and published based on our `Dockerfile`. There is also a `docker-compose.yml`
-file to deploy the app in Docker Swarm as a Stack, including a Mongo DB
-service.
+Discord Fate Bot is available [on Docker Hub][docker-dfb]. Images are
+automatically built and published based on our `Dockerfile`. There is also a
+`docker-compose.yml` file to deploy the app in Docker Swarm as a Stack,
+including a Mongo DB service.
 
 ### Installing in Docker Swarm as a Stack
 
@@ -125,14 +125,43 @@ $ curl https://raw.githubusercontent.com/chrisbouchard/discord-fate-bot/master/d
       docker stack deploy --compose-file - discord-fate-bot
 ```
 
-### Installing Other Ways
+### Installing from PyPI
 
-More to be written&hellip;
+Discord Fate Bot is also available [on PyPI][pypi-dfb].
+
+```
+$ pip install discord-fate-bot
+$ discord-fate-bot
+```
+
+Make sure to configure your environment variables to hook up to Discord and
+your Mongo database (see below).
+
+### Installing from Source
+
+I don't necessarily recommend this for production, but you can check out the
+project locally and install in a virtual environment.
+
+Make sure you have at least Python 3.7 installed. You'll also need to
+[install Poetry][install-poetry], which we use for dependency management
+and packaging.
+
+```
+$ git checkout https://github.com/chrisbouchard/discord-fate-bot.git
+$ cd discord-fate-bot
+$ poetry install
+$ poetry run discord-fate-bot
+```
+
+Make sure to configure your environment variables to hook up to Discord and
+your Mongo database (see below).
+
+[install-poetry]: https://python-poetry.org/docs/#installation
 
 
 ## Configuring
 
-The bot looks for the following environment variables on start-up.
+Discord Fate Bot looks for the following environment variables on start-up.
 
 * `DFB_BOT_TOKEN` &mdash; The Discord authentication token for the bot account.
     * Mutually exclusive with `DFB_BOT_TOKEN_FILE`.
@@ -160,7 +189,7 @@ Discord token and Mongo password into the services.
 
 ## Architecture
 
-This bot is written in Python, mostly based on the awesome
+Discord Fate Bot is written in Python, mostly based on the awesome
 [Discord.py][discord-py] library. We use [MongoDB][mongo-db] for long-term
 storage when necessary (e.g., for scenes and aspects).
 
