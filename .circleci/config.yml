@@ -3,27 +3,19 @@ version: 2.1
 orbs:
   docker: circleci/docker@1.0.1
 
-commands:
-  set-up-poetry:
-    description: Install Pipenv and Sync Dependencies
-    steps:
-      - run:
-          name: Install Poetry
-          command: |
-            pip install --no-cache-dir poetry==1.0.5
-      - run:
-          name: Install Development Dependencies
-          command: |
-            poetry install
-
 jobs:
   test:
     description: Verify that Unit Tests Pass
     docker:
-      - image: python:3.7-buster
+      - image: chrisbouchard/python-poetry:3.7-1.0.5
     steps:
       - checkout
-      - set-up-poetry
+      - run:
+          # TODO: Find a way to share installed deps between jobs. Add venv to
+          # workspace?
+          name: Install Development Dependencies
+          command: |
+            poetry install
       - run:
           name: Run Unit Tests
           command: |
@@ -34,14 +26,17 @@ jobs:
   build:
     description: Build the Distribution
     docker:
-      - image: python:3.7-buster
+      - image: chrisbouchard/python-poetry:3.7-1.0.5
     steps:
       - checkout
-      - set-up-poetry
       - run:
           name: Export requirements.txt
           command: |
             poetry export --format requirements.txt --output requirements.txt
+      - run:
+          name: Install Development Dependencies
+          command: |
+            poetry install
       - run:
           name: Poetry build
           command: |
@@ -59,7 +54,7 @@ jobs:
   publish-pypi:
     description: Publish to PyPI
     docker:
-      - image: python:3.7-buster
+      - image: chrisbouchard/python-poetry:3.7-1.0.5
     steps:
       - checkout
       - set-up-poetry
