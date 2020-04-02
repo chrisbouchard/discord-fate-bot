@@ -34,7 +34,7 @@ jobs:
   build:
     description: Build the Distribution
     docker:
-      - image: python:3.7-alpine
+      - image: python:3.7-buster
     steps:
       - checkout
       - set-up-poetry
@@ -59,7 +59,7 @@ jobs:
   publish-pypi:
     description: Publish to PyPI
     docker:
-      - image: python:3.7-alpine
+      - image: python:3.7-buster
     steps:
       - checkout
       - set-up-poetry
@@ -86,6 +86,7 @@ jobs:
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
+# Private map with some common job filter definitions.
 .filters:
   all-branches-and-tags: &all-branches-and-tags
     branches:
