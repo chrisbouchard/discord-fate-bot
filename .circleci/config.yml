@@ -86,6 +86,19 @@ jobs:
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
+.filters:
+  all-branches-and-tags: &all-branches-and-tags
+    branches:
+      only: /.*/
+    tags:
+      only: /.*/
+
+  only-version-tags: &only-version-tags
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^\d+\.\d+\.\d+/
+
 workflows:
   version: 2
   test-publish:
@@ -118,17 +131,4 @@ workflows:
           filters:
             <<: *only-version-tags
           context: discord-fate-bot/publish-docker-hub
-
-.filters:
-  all-branches-and-tags: &all-branches-and-tags
-    branches:
-      only: /.*/
-    tags:
-      only: /.*/
-
-  only-version-tags: &only-version-tags
-    branches:
-      ignore: /.*/
-    tags:
-      only: /^\d+\.\d+\.\d+/
 
