@@ -57,7 +57,6 @@ jobs:
       - image: chrisbouchard/python-poetry:3.7-1.0.5
     steps:
       - checkout
-      - set-up-poetry
       - attach_workspace:
           at: .
       - run:
