@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "discord-fate-bot"
+version = "0.1.1"
+description = "Discord bot to help run a FATE campaign"
+authors = ["Chris Bouchard <chris@upliftinglemma.net>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/chrisbouchard/discord-fate-bot"
+repository = "https://github.com/chrisbouchard/discord-fate-bot"
+classifiers = [
+    "Operating System :: OS Independent",
+    "Topic :: Communications :: Chat",
+    "Topic :: Games/Entertainment :: Role-Playing"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+aiofiles = "^0.4.0"
+aiorun = "^2020.2.1"
+"discord.py" = "^1.3.2"
+environ-config = "^20.1.0"
+mashumaro = "^1.12"
+motor = "^2.1.0"
+
+[tool.poetry.dev-dependencies]
+unittest-xml-reporting = "^3.0.2"
+
+[tool.poetry.scripts]
+discord-fate-bot = "discord_fate_bot.console_script:main"
+
+[build-system]
+requires = ["poetry>=1.0.5"]
+build-backend = "poetry.masonry.api"

@@ -1,69 +1,134 @@
 version: 2.1
 
 orbs:
-  docker: circleci/docker@1.0.0
+  docker: circleci/docker@1.0.1
 
 commands:
-  set-up-pipenv:
+  set-up-poetry:
     description: Install Pipenv and Sync Dependencies
     steps:
       - run:
-          name: Install Pipenv
+          name: Install Poetry
           command: |
-            pip install --no-cache-dir pipenv==2018.11.26
+            pip install --no-cache-dir poetry==1.0.5
       - run:
           name: Install Development Dependencies
           command: |
-            pipenv sync --dev
+            poetry install
 
 jobs:
-  pipenv-check:
-    description: Check for Security Vulnerabilities
-    docker:
-      - image: python:3.7-buster
-    steps:
-      - checkout
-      - set-up-pipenv
-      - run:
-          name: Run Check
-          command: |
-            pipenv check
-
-  pipenv-unittest:
+  test:
     description: Verify that Unit Tests Pass
     docker:
       - image: python:3.7-buster
     steps:
       - checkout
-      - set-up-pipenv
+      - set-up-poetry
       - run:
           name: Run Unit Tests
           command: |
-            pipenv run python -m xmlrunner discover -o /tmp/tests-xml-output/
+            poetry run python -m xmlrunner discover -o /tmp/tests-xml-output/
       - store_test_results:
           path: /tmp/tests-xml-output/
+
+  build:
+    description: Build the Distribution
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - checkout
+      - set-up-poetry
+      - run:
+          name: Export requirements.txt
+          command: |
+            poetry export --format requirements.txt --output requirements.txt
+      - run:
+          name: Poetry build
+          command: |
+            poetry build
+      - store_artifacts:
+          path: dist
+      - store_artifacts:
+          path: requirements.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist/*
+            - requirements.txt
+
+  publish-pypi:
+    description: Publish to PyPI
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - checkout
+      - set-up-poetry
+      - attach_workspace:
+          at: .
+      - run:
+          name: Poetry upload
+          command: |
+            poetry upload
+
+  publish-docker-hub:
+    description: Publish to Docker Hub
+    executor: docker/docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
+      - docker/check
+      - docker/build:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+      - docker/push:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
 workflows:
   version: 2
   test-publish:
     jobs:
-      - pipenv-check
-      - pipenv-unittest
+      - test:
+          filters:
+            <<: *all-branches-and-tags
 
       - docker/hadolint:
-          ignore-rules: DL3013
+          filters:
+            <<: *all-branches-and-tags
 
-      - docker/publish:
-          name: publish-app
+      - build:
           requires:
-            - pipenv-check
-            - pipenv-unittest
+            - test
             - docker/hadolint
           filters:
-            branches:
-              only: master
-          context: discord-fate-bot/publish
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
-          cache_from: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:latest
-          tag: $CIRCLE_SHA1,latest
+            <<: *all-branches-and-tags
+
+      - publish-pypi:
+          requires:
+            - build
+          filters:
+            <<: *only-version-tags
+          context: discord-fate-bot/publish-pypi
+
+      - publish-docker-hub:
+          requires:
+            - build
+          filters:
+            <<: *only-version-tags
+          context: discord-fate-bot/publish-docker-hub
+
+.filters:
+  all-branches-and-tags: &all-branches-and-tags
+    branches:
+      only: /.*/
+    tags:
+      only: /.*/
+
+  only-version-tags: &only-version-tags
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^\d+\.\d+\.\d+/
 
