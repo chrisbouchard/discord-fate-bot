@@ -1,24 +1,19 @@
-# Stage 1: Environment to build binary wheel
-
-FROM python:3.7-buster as build
-
-COPY . /app
-WORKDIR /app
-
-RUN pip install --no-cache-dir pipenv==2018.11.26 \
-        && pipenv sync --dev \
-        && pipenv lock -r > requirements.txt \
-        && pipenv run python setup.py bdist_wheel
-
-
-# Stage 2: Environment to run bot
-
 FROM python:3.7-buster
 
-WORKDIR /usr/src/app
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
 
-COPY --from=build /app/dist/*.whl .
-RUN pip install --no-cache-dir ./*.whl
+WORKDIR /app
+
+# Install dependencies first so we can cache this layer.
+COPY requirements.txt .
+RUN pip install --requirement requirements.txt
+
+# Then install the wheel. We ignore DL3013 because it doesn't make sense to
+# specify a version when installing a wheel.
+COPY dist/*.whl .
+# hadolint ignore=DL3013
+RUN pip install ./*.whl
 
 CMD [ "discord-fate-bot" ]
 
