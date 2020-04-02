@@ -66,9 +66,9 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Poetry upload
+          name: Poetry publish
           command: |
-            poetry upload
+            poetry publish
 
   publish-docker-hub:
     description: Publish to Docker Hub
