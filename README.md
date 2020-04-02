@@ -1,9 +1,9 @@
 # Discord Fate Bot
 
 [![CircleCI][circleci-dfb-svg]][circleci-dfb]
+[![Docker][shieldsio-docker-dfb]][docker-dfb]
 [![PyPI Version][shieldsio-pypi-dfb]][pypi-dfb]
 [![PyPI Python][shieldsio-python-dfb]][pypi-dfb]
-[![Docker][shieldsio-docker-dfb]][docker-dfb]
 
 A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
