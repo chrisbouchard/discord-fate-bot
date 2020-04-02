@@ -14,7 +14,7 @@ A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 [circleci-dfb-svg]: https://circleci.com/gh/chrisbouchard/discord-fate-bot.svg?style=svg
 [docker-dfb]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
 [pypi-dfb]: https://pypi.org/project/discord-fate-bot/
-[shieldsio-docker-dfb]: https://img.shields.io/docker/v/chrisbouchard/discord-fate-bot?label=docker
+[shieldsio-docker-dfb]: https://img.shields.io/docker/v/chrisbouchard/discord-fate-bot?sort=semver&label=docker
 [shieldsio-pypi-dfb]: https://img.shields.io/pypi/v/discord-fate-bot
 [shieldsio-python-dfb]: https://img.shields.io/pypi/pyversions/discord-fate-bot
 
