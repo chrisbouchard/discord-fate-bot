@@ -3,6 +3,7 @@
 [![CircleCI][circleci-dfb-svg]][circleci-dfb]
 [![PyPI Version][shieldsio-pypi-dfb]][pypi-dfb]
 [![PyPI Python][shieldsio-python-dfb]][pypi-dfb]
+[![Docker][shieldsio-docker-dfb]][docker-dfb]
 
 A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
@@ -11,7 +12,9 @@ A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 
 [circleci-dfb]: https://circleci.com/gh/chrisbouchard/discord-fate-bot
 [circleci-dfb-svg]: https://circleci.com/gh/chrisbouchard/discord-fate-bot.svg?style=svg
+[docker-dfb]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
 [pypi-dfb]: https://pypi.org/project/discord-fate-bot/
+[shieldsio-docker-dfb]: https://img.shields.io/docker/v/chrisbouchard/discord-fate-bot?label=docker
 [shieldsio-pypi-dfb]: https://img.shields.io/pypi/v/discord-fate-bot
 [shieldsio-python-dfb]: https://img.shields.io/pypi/pyversions/discord-fate-bot
 
@@ -111,8 +114,6 @@ There project is available on Docker Hub at
 and published based on our `Dockerfile`. There is also a `docker-compose.yml`
 file to deploy the app in Docker Swarm as a Stack, including a Mongo DB
 service.
-
-[docker-dfb]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
 
 ### Installing in Docker Swarm as a Stack
 
