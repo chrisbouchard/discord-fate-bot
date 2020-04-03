@@ -19,17 +19,18 @@ commands:
       tag:
         type: string
     steps:
-      run: |
+      - run: |
         IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
 
-        for tag in "${DOCKER_TAGS[@]}"; do
+        for tag in "${DOCKER_TAGS[@]}"
+        do
             docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
         done
 
         docker app bundle <<parameters.app-name>> $docker_tag_args
 
   docker-app-push:
-    description: 'Build a Docker App bundle'
+    description: 'Push a Docker App bundle'
     parameters:
       app-name:
         type: string
@@ -38,10 +39,11 @@ commands:
       tag:
         type: string
     steps:
-      run: |
+      - run: |
         IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
 
-        for tag in "${DOCKER_TAGS[@]}"; do
+        for tag in "${DOCKER_TAGS[@]}"
+        do
             docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
         done
 
