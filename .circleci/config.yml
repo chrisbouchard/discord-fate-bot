@@ -21,12 +21,10 @@ commands:
     steps:
       - run: |
         IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
-
         for tag in "${DOCKER_TAGS[@]}"
         do
             docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
         done
-
         docker app bundle <<parameters.app-name>> $docker_tag_args
 
   docker-app-push:
@@ -41,12 +39,10 @@ commands:
     steps:
       - run: |
         IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
-
         for tag in "${DOCKER_TAGS[@]}"
         do
             docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
         done
-
         docker app push <<parameters.app-name>> $docker_tag_args
 
 jobs:
