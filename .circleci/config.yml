@@ -135,9 +135,11 @@ jobs:
           command: |
             docker app bundle --tag $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-app:$CIRCLE_SHA1
       - docker-app-build:
+          app-name: discord-fate-bot
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
       - docker-app-push:
+          app-name: discord-fate-bot
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
