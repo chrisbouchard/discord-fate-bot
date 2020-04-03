@@ -8,6 +8,45 @@ executors:
     docker: 
       - image: chrisbouchard/discord-fate-bot-build:3.8
 
+commands:
+  docker-app-build:
+    description: 'Build a Docker App bundle'
+    parameters:
+      app-name:
+        type: string
+      image:
+        type: string
+      tag:
+        type: string
+    steps:
+      run: |
+        IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+        for tag in "${DOCKER_TAGS[@]}"; do
+            docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+        done
+
+        docker app bundle <<parameters.app-name>> $docker_tag_args
+
+  docker-app-push:
+    description: 'Build a Docker App bundle'
+    parameters:
+      app-name:
+        type: string
+      image:
+        type: string
+      tag:
+        type: string
+    steps:
+      run: |
+        IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+        for tag in "${DOCKER_TAGS[@]}"; do
+            docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+        done
+
+        docker app push <<parameters.app-name>> $docker_tag_args
+
 jobs:
   test:
     description: Verify that Unit Tests Pass
@@ -82,6 +121,24 @@ jobs:
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
+  publish-app-docker-hub:
+    description: Publish App to Docker Hub
+    executor: discord-fate-bot-build
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run:
+          name: Docker App Bundle
+          command: |
+            docker app bundle --tag $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-app:$CIRCLE_SHA1
+      - docker-app-build:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+      - docker-app-push:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+
 # Private map with some common job filter definitions.
 .filters:
   all-branches-and-tags: &all-branches-and-tags
@@ -125,6 +182,13 @@ workflows:
       - publish-docker-hub:
           requires:
             - build
+          filters:
+            <<: *only-version-tags
+          context: discord-fate-bot/publish-docker-hub
+
+      - publish-app-docker-hub:
+          requires:
+            - publish-docker-hub
           filters:
             <<: *only-version-tags
           context: discord-fate-bot/publish-docker-hub

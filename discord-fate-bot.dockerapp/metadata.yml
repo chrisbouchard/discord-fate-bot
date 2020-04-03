@@ -1,0 +1,14 @@
+# Version of the application
+version: $VERSION
+
+# Name of the application
+name: discord-fate-bot
+
+# A short description of the application
+description: Discord bot to help play the Fate role playing game
+
+# List of application maintainers with name and email for each
+maintainers:
+  - name: Chris Bouchard
+    email: chris@upliftinglemma.net
+
