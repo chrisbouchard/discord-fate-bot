@@ -7,7 +7,8 @@ ARG DOCKER_APP_VERSION=0.8.0
 
 # Install Docker App
 RUN export OSTYPE="$(uname | tr A-Z a-z)" && \
-        curl -fsSL --output "/tmp/docker-app-${OSTYPE}.tar.gz" "https://github.com/docker/app/releases/download/v${DOCKER_APP_VERSION}/docker-app-${OSTYPE}.tar.gz" && \
+        curl -fsSL --output "/tmp/docker-app-${OSTYPE}.tar.gz" \
+            "https://github.com/docker/app/releases/download/v${DOCKER_APP_VERSION}/docker-app-${OSTYPE}.tar.gz" && \
         tar xf "/tmp/docker-app-${OSTYPE}.tar.gz" -C /tmp/ && \
         mkdir -p ~/.docker/cli-plugins && \
         cp "/tmp/docker-app-plugin-${OSTYPE}" ~/.docker/cli-plugins/docker-app
