@@ -20,12 +20,14 @@ commands:
         type: string
     steps:
       - run: |
-        IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
-        for tag in "${DOCKER_TAGS[@]}"
-        do
-            docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
-        done
-        docker app bundle <<parameters.app-name>> $docker_tag_args
+          IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+          for tag in "${DOCKER_TAGS[@]}"
+          do
+              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+          done
+
+          docker app bundle <<parameters.app-name>> $docker_tag_args
 
   docker-app-push:
     description: 'Push a Docker App bundle'
@@ -38,12 +40,14 @@ commands:
         type: string
     steps:
       - run: |
-        IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
-        for tag in "${DOCKER_TAGS[@]}"
-        do
-            docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
-        done
-        docker app push <<parameters.app-name>> $docker_tag_args
+          IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+          for tag in "${DOCKER_TAGS[@]}"
+          do
+              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+          done
+
+          docker app push <<parameters.app-name>> $docker_tag_args
 
 jobs:
   test:
