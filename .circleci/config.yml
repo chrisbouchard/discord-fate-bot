@@ -117,10 +117,10 @@ jobs:
           at: .
       - docker/check
       - docker/build:
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          image: $DFB_DOCKER_IMAGE
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
       - docker/push:
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          image: $DFB_DOCKER_IMAGE
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
   publish-app-docker-hub:
@@ -139,11 +139,11 @@ jobs:
       - docker/check
       - docker-app-build:
           app-name: discord-fate-bot
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          image: $DFB_DOCKER_APP_IMAGE
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
       - docker-app-push:
           app-name: discord-fate-bot
-          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          image: $DFB_DOCKER_APP_IMAGE
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
 # Private map with some common job filter definitions.
