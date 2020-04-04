@@ -14,20 +14,9 @@ commands:
     parameters:
       app-name:
         type: string
-      image:
-        type: string
-      tag:
-        type: string
     steps:
       - run: |
-          IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
-
-          for tag in "${DOCKER_TAGS[@]}"
-          do
-              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
-          done
-
-          docker app bundle <<parameters.app-name>> $docker_tag_args
+          docker app bundle <<parameters.app-name>>
 
   docker-app-push:
     description: 'Push a Docker App bundle'
@@ -44,10 +33,8 @@ commands:
 
           for tag in "${DOCKER_TAGS[@]}"
           do
-              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+              docker app push <<parameters.app-name>> --tag <<parameters.image>>:$tag
           done
-
-          docker app push <<parameters.app-name>> $docker_tag_args
 
 jobs:
   test:
@@ -118,10 +105,10 @@ jobs:
       - docker/check
       - docker/build:
           image: $DFB_DOCKER_IMAGE
-          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+          tag: $CIRCLE_TAG,latest
       - docker/push:
           image: $DFB_DOCKER_IMAGE
-          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+          tag: $CIRCLE_TAG,latest
 
   publish-app-docker-hub:
     description: Publish App to Docker Hub
@@ -129,22 +116,23 @@ jobs:
     steps:
       - checkout
       - run:
+          # TODO: I'd love to drop this step. I suppose I could bake the
+          # numbers into the files directly, and update them when I rev the
+          # version.
           name: Update App Version
           command: |
             sed --in-place \
                 "s/\$VERSION/$CIRCLE_TAG/" \
-                discord-fate-bot.dockerapp/metadata.yml \
-                discord-fate-bot.dockerapp/docker-compose.yml
+                discord-fate-bot-app.dockerapp/metadata.yml \
+                discord-fate-bot-app.dockerapp/docker-compose.yml
       - setup_remote_docker
       - docker/check
       - docker-app-build:
-          app-name: discord-fate-bot
-          image: $DFB_DOCKER_APP_IMAGE
-          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+          app-name: discord-fate-bot-app
       - docker-app-push:
-          app-name: discord-fate-bot
+          app-name: discord-fate-bot-app
           image: $DFB_DOCKER_APP_IMAGE
-          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+          tag: $CIRCLE_TAG,latest
 
 # Private map with some common job filter definitions.
 .filters:
