@@ -2,7 +2,7 @@
 version: $VERSION
 
 # Name of the application
-name: discord-fate-bot
+name: discord-fate-bot-app
 
 # A short description of the application
 description: Discord bot to help play the Fate role playing game
