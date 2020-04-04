@@ -110,6 +110,10 @@ freeze it once I release a stable public version.
 
 ## Installing
 
+***This section is out-of-date since I've started bulding a Docker App.***
+Please bear with me while I work out the bugs with that, and then I'll update
+this section.
+
 Discord Fate Bot is available [on Docker Hub][docker-dfb]. Images are
 automatically built and published based on our `Dockerfile`. There is also a
 `docker-compose.yml` file to deploy the app in Docker Swarm as a Stack,

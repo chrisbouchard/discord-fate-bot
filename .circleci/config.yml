@@ -3,11 +3,56 @@ version: 2.1
 orbs:
   docker: circleci/docker@1.0.1
 
+executors:
+  discord-fate-bot-build:
+    docker: 
+      - image: chrisbouchard/discord-fate-bot-build:3.8
+
+commands:
+  docker-app-build:
+    description: 'Build a Docker App bundle'
+    parameters:
+      app-name:
+        type: string
+      image:
+        type: string
+      tag:
+        type: string
+    steps:
+      - run: |
+          IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+          for tag in "${DOCKER_TAGS[@]}"
+          do
+              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+          done
+
+          docker app bundle <<parameters.app-name>> $docker_tag_args
+
+  docker-app-push:
+    description: 'Push a Docker App bundle'
+    parameters:
+      app-name:
+        type: string
+      image:
+        type: string
+      tag:
+        type: string
+    steps:
+      - run: |
+          IFS="," read -ra DOCKER_TAGS \<<< "<<parameters.tag>>"
+
+          for tag in "${DOCKER_TAGS[@]}"
+          do
+              docker_tag_args="$docker_tag_args -t <<parameters.image>>:${tag}"
+          done
+
+          docker app push <<parameters.app-name>> $docker_tag_args
+
 jobs:
   test:
     description: Verify that Unit Tests Pass
-    docker:
-      - image: chrisbouchard/python-poetry:3.7-1.0.5
+    executor: discord-fate-bot-build
     steps:
       - checkout
       - run:
@@ -25,8 +70,7 @@ jobs:
 
   build:
     description: Build the Distribution
-    docker:
-      - image: chrisbouchard/python-poetry:3.7-1.0.5
+    executor: discord-fate-bot-build
     steps:
       - checkout
       - run:
@@ -53,8 +97,7 @@ jobs:
 
   publish-pypi:
     description: Publish to PyPI
-    docker:
-      - image: chrisbouchard/python-poetry:3.7-1.0.5
+    executor: discord-fate-bot-build
     steps:
       - checkout
       - attach_workspace:
@@ -66,7 +109,7 @@ jobs:
 
   publish-docker-hub:
     description: Publish to Docker Hub
-    executor: docker/docker
+    executor: discord-fate-bot-build
     steps:
       - checkout
       - setup_remote_docker
@@ -77,6 +120,26 @@ jobs:
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
       - docker/push:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+
+  publish-app-docker-hub:
+    description: Publish App to Docker Hub
+    executor: discord-fate-bot-build
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run:
+          name: Docker App Bundle
+          command: |
+            docker app bundle --tag $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-app:$CIRCLE_SHA1
+      - docker-app-build:
+          app-name: discord-fate-bot
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
+      - docker-app-push:
+          app-name: discord-fate-bot
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_SHA1,$CIRCLE_TAG,latest
 
@@ -123,6 +186,13 @@ workflows:
       - publish-docker-hub:
           requires:
             - build
+          filters:
+            <<: *only-version-tags
+          context: discord-fate-bot/publish-docker-hub
+
+      - publish-app-docker-hub:
+          requires:
+            - publish-docker-hub
           filters:
             <<: *only-version-tags
           context: discord-fate-bot/publish-docker-hub
