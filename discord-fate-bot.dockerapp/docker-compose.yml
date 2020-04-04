@@ -3,7 +3,7 @@ version: "3.6"
 
 services:
   app:
-    image: chrisbouchard/discord-fate-bot:${VERSION:-latest}
+    image: chrisbouchard/discord-fate-bot:$VERSION
     deploy:
       restart_policy:
         condition: on-failure

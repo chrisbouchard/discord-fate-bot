@@ -128,12 +128,15 @@ jobs:
     executor: discord-fate-bot-build
     steps:
       - checkout
+      - run:
+          name: Update App Version
+          command: |
+            sed --in-place \
+                "s/\$VERSION/$CIRCLE_TAG/" \
+                discord-fate-bot.dockerapp/metadata.yml \
+                discord-fate-bot.dockerapp/docker-compose.yml
       - setup_remote_docker
       - docker/check
-      - run:
-          name: Docker App Bundle
-          command: |
-            docker app bundle --tag $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME-app:$CIRCLE_SHA1
       - docker-app-build:
           app-name: discord-fate-bot
           image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
