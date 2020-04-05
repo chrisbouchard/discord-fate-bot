@@ -127,7 +127,7 @@ manager, and the database will be saved in a Docker volume.
 To install as an App, first [install Docker App in your
 swarm][docker-app-install]. Then simply install Discord Fate Bot using
 
-```
+```console
 $ docker secret create discord-fate-bot-token -
 # Enter your Discord Bot Auth Token
 $ docker secret create discord-fate-bot-mongo-password -
@@ -143,7 +143,7 @@ service logs` to view logs.
 When a new version of Discord Fate Bot is released, you can update your
 application to the latest version using
 
-```
+```console
 $ docker app upgrade discord-fate-bot-app --app-name=chrisbouchard/discord-fate-bot-app
 ```
 
@@ -153,7 +153,7 @@ $ docker app upgrade discord-fate-bot-app --app-name=chrisbouchard/discord-fate-
 
 Discord Fate Bot is also available [on PyPI][pypi-dfb].
 
-```
+```console
 $ pip install discord-fate-bot
 $ discord-fate-bot
 ```
@@ -170,7 +170,7 @@ Make sure you have at least Python 3.7 installed. You'll also need to
 [install Poetry][install-poetry], which we use for dependency management
 and packaging.
 
-```
+```console
 $ git checkout https://github.com/chrisbouchard/discord-fate-bot.git
 $ cd discord-fate-bot
 $ poetry install
