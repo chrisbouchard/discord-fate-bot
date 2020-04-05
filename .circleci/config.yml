@@ -115,16 +115,6 @@ jobs:
     executor: discord-fate-bot-build
     steps:
       - checkout
-      - run:
-          # TODO: I'd love to drop this step. I suppose I could bake the
-          # numbers into the files directly, and update them when I rev the
-          # version.
-          name: Update App Version
-          command: |
-            sed --in-place \
-                "s/\$VERSION/$CIRCLE_TAG/" \
-                discord-fate-bot-app.dockerapp/metadata.yml \
-                discord-fate-bot-app.dockerapp/docker-compose.yml
       - setup_remote_docker
       - docker/check
       - docker-app-build:
