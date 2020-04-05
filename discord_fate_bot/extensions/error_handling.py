@@ -4,6 +4,7 @@ import textwrap
 
 from discord.ext.commands import Cog, CommandInvokeError, UserInputError
 
+from ..emojis import ERROR_EMOJIS
 from ..scenes import AspectIdError, NoCurrentSceneError
 
 logger = logging.getLogger(__name__)
@@ -11,17 +12,6 @@ logger = logging.getLogger(__name__)
 def setup(bot):
     bot.add_cog(ErrorHandlingCog())
 
-_UNHANDLED_ERROR_EMOJI_NAMES = [
-    'cold_face',
-    'cold_sweat',
-    'confounded',
-    'grimacing',
-    'head_bandage',
-    'hot_face',
-    'scream',
-    'sob',
-    'thermometer_face',
-]
 
 class ErrorHandlingCog(Cog):
     @Cog.listener()
@@ -55,8 +45,8 @@ class ErrorHandlingCog(Cog):
                 await ctx.send(content=message)
                 return
 
-        emoji_name = random.choice(_UNHANDLED_ERROR_EMOJI_NAMES)
-        message = f"{ctx.author.mention} Sorry, something unexpected went wrong.  :{emoji_name}:"
+        emoji_name = random.choice(ERROR_EMOJIS)
+        message = f"{ctx.author.mention} Sorry, something unexpected went wrong.  {emoji_name}"
         await ctx.send(content=message)
 
         raise error

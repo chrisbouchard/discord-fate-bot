@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import random
 
 from discord import NotFound
 from discord.ext.commands import Bot, Cog, Converter, Greedy, command, group
@@ -7,6 +8,7 @@ from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
 from ..bot import DiscordFateBot
+from ..emojis import SUCCESS_EMOJIS
 from ..scenes import NoCurrentSceneError, Scene, SceneAspect, SceneDao
 
 logger = logging.getLogger(__name__)
@@ -144,7 +146,7 @@ class SceneManagementCog(Cog, name='Scene Management'):
                 pass
 
     async def _react_ok(self, ctx):
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        await ctx.message.add_reaction(random.choice(SUCCESS_EMOJIS))
 
     async def _save_scene_and_update_message(self, ctx, scene):
         await self.scene_dao.save(scene)

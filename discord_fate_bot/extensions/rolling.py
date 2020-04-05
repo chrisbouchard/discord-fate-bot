@@ -2,6 +2,7 @@ from discord.ext.commands import BadArgument, Cog, Converter, Greedy, command
 from typing import Optional
 
 from ..dice import FateDiePool, Roll, RollContext, Value
+from ..emojis import ROLL_EMOJI
 
 def setup(bot):
     bot.add_cog(RollingCog())
@@ -82,7 +83,7 @@ class RollingCog(Cog, name = 'Rolling'):
 
         roll = DICE_POOL.roll(context)
 
-        message = f':game_die: {player.mention} \[{ctx.message.content}\]  {roll.description()}\n\n'
+        message = f'{ROLL_EMOJI} {player.mention} \[{ctx.message.content}\]  {roll.description()}\n\n'
         message += f'```\n{roll.dice_display()}```\n'
         message += f'({roll.explanation()})'
 
