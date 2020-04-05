@@ -124,15 +124,29 @@ The app for Discord Fate Bot defines two services, one for the bot itself, and
 one for a MongoDB database. The latter will only be replicated to the swarm
 manager, and the database will be saved in a Docker volume.
 
-To install as an App, first [install Docker App in your
-swarm][docker-app-install]. Then simply install Discord Fate Bot using
+To install as an App, first [install Docker App][docker-app-install]. It's a
+CLI extension, so you just need it on the machine where you're managing the
+swarm.
+
+Next, set up the necessary secrets to run the app.
 
 ```console
 $ docker secret create discord-fate-bot-token -
-# Enter your Discord Bot Auth Token
 $ docker secret create discord-fate-bot-mongo-password -
-# Enter a root password for the MongoDB service
+```
+
+Each command will wait for you to type input on standard input (end with Ctrl-D
+on a new line). Alternately, you can pipe in the secret or supply a filename in
+place of `-`.
+
+Finally, install the app itself.
+
+```
 $ docker app install chrisbouchard/discord-fate-bot-app
+Creating network discord-fate-bot-app_internal
+Creating service discord-fate-bot-app_app
+Creating service discord-fate-bot-app_mongo
+Application "discord-fate-bot-app" installed on context "default"
 ```
 
 Using the default name, the services created will be `discord-fate-bot-app_app`
@@ -141,13 +155,17 @@ You can use the standard Docker Swarm tools to manage them, e.g., `docker
 service logs` to view logs.
 
 When a new version of Discord Fate Bot is released, you can update your
-application to the latest version using
+application to the latest version as so.
 
 ```console
 $ docker app upgrade discord-fate-bot-app --app-name=chrisbouchard/discord-fate-bot-app
+Updating service discord-fate-bot-app_app (id: ...)
+Updating service discord-fate-bot-app_mongo (id: ...)
+Application "discord-fate-bot-app" upgraded on context "default"
 ```
 
 [docker-app]: https://github.com/docker/app
+[docker-app-install]: https://github.com/docker/app#installation
 
 ### Installing from PyPI
 
