@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from typing import Dict, Optional, Set
 
 from .database import Document, SubDocument
+from .emojis import SCENE_EMOJI
 
 class NoCurrentSceneError(Exception):
     def __init__(self):
@@ -73,7 +74,17 @@ class Scene(Document, version=1):
         else:
             aspects_str = '    •  _No aspects. Add some with !aspect._'
 
-        return f':clapper:  __**{description}**__\n{aspects_str}'
+        description_lines = description.splitlines()
+        description_str = '\n'.join([
+            f'__**{description_lines[0]}**__',
+            *description_lines[1:],
+        ])
+
+        if len(description_lines) > 1:
+            description_str += '\n'
+
+        return f'{SCENE_EMOJI}  {description_str}\n{aspects_str}'
+
 
 class SceneDao:
     database: AsyncIOMotorDatabase
