@@ -141,7 +141,7 @@ place of `-`.
 
 Finally, install the app itself.
 
-```
+```console
 $ docker app install chrisbouchard/discord-fate-bot-app
 Creating network discord-fate-bot-app_internal
 Creating service discord-fate-bot-app_app
