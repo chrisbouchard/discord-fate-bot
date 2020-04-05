@@ -1,4 +1,12 @@
 [[package]]
+category = "dev"
+description = "Version-bump your software with a single command!"
+name = "advbumpversion"
+optional = false
+python-versions = "*"
+version = "1.2.0"
+
+[[package]]
 category = "main"
 description = "File support for asyncio."
 name = "aiofiles"
@@ -206,10 +214,14 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "68605c489764d8d05aa38caaf7405eda64262be80d3aa07357b7f0631dc64196"
+content-hash = "70c1d65c67f2dc7e508b6dcbc7366d98a6b1be33b6bb998f13e1ac7c55075894"
 python-versions = "^3.7"
 
 [metadata.files]
+advbumpversion = [
+    {file = "advbumpversion-1.2.0-py2.py3-none-any.whl", hash = "sha256:87445c9c755b2155f3ccf03c3cd9b2d94589b044d38cbdda775c315397c934d1"},
+    {file = "advbumpversion-1.2.0.tar.gz", hash = "sha256:a605d545ca4153c38b82c994729b1bc11b7d23bff4226e45440bbbc1881df8a5"},
+]
 aiofiles = [
     {file = "aiofiles-0.4.0-py3-none-any.whl", hash = "sha256:1e644c2573f953664368de28d2aa4c89dfd64550429d0c27c4680ccd3aa4985d"},
     {file = "aiofiles-0.4.0.tar.gz", hash = "sha256:021ea0ba314a86027c166ecc4b4c07f2d40fc0f4b3a950d1868a0f2571c2bbee"},

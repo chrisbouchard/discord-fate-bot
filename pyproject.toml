@@ -24,6 +24,7 @@ motor = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 unittest-xml-reporting = "^3.0.2"
+advbumpversion = "^1.2.0"
 
 [tool.poetry.scripts]
 discord-fate-bot = "discord_fate_bot.console_script:main"
@@ -31,3 +32,4 @@ discord-fate-bot = "discord_fate_bot.console_script:main"
 [build-system]
 requires = ["poetry>=1.0.5"]
 build-backend = "poetry.masonry.api"
+
