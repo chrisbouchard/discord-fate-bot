@@ -2,6 +2,7 @@
 
 [![CircleCI][circleci-dfb-svg]][circleci-dfb]
 [![Docker][shieldsio-docker-dfb]][docker-dfb]
+[![Docker App][shieldsio-docker-dfb-app]][docker-dfb-app]
 [![PyPI Version][shieldsio-pypi-dfb]][pypi-dfb]
 [![PyPI Python][shieldsio-python-dfb]][pypi-dfb]
 
@@ -13,8 +14,10 @@ A [Discord][discordapp] bot to help play the [Fate roleplaying game][fate-rpg].
 [circleci-dfb]: https://circleci.com/gh/chrisbouchard/discord-fate-bot
 [circleci-dfb-svg]: https://circleci.com/gh/chrisbouchard/discord-fate-bot.svg?style=svg
 [docker-dfb]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot
+[docker-dfb-app]: https://hub.docker.com/repository/docker/chrisbouchard/discord-fate-bot-app
 [pypi-dfb]: https://pypi.org/project/discord-fate-bot/
 [shieldsio-docker-dfb]: https://img.shields.io/docker/v/chrisbouchard/discord-fate-bot?sort=semver&label=docker
+[shieldsio-docker-dfb-app]: https://img.shields.io/docker/v/chrisbouchard/discord-fate-bot-app?sort=semver&label=docker%20app
 [shieldsio-pypi-dfb]: https://img.shields.io/pypi/v/discord-fate-bot
 [shieldsio-python-dfb]: https://img.shields.io/pypi/pyversions/discord-fate-bot
 
@@ -110,24 +113,41 @@ freeze it once I release a stable public version.
 
 ## Installing
 
-***This section is out-of-date since I've started bulding a Docker App.***
-Please bear with me while I work out the bugs with that, and then I'll update
-this section.
+### Installing in Docker Swarm as an App
 
-Discord Fate Bot is available [on Docker Hub][docker-dfb]. Images are
-automatically built and published based on our `Dockerfile`. There is also a
-`docker-compose.yml` file to deploy the app in Docker Swarm as a Stack,
-including a Mongo DB service.
+This is the approach I'm currently using. [Docker App][docker-app] is currently
+an experimental plugin for Docker for deploying application bundles in Docker
+Swarm.  The bundles are uploaded as images right in Docker Hub, and the service
+images are baked right into the application bundle.
 
-### Installing in Docker Swarm as a Stack
+The app for Discord Fate Bot defines two services, one for the bot itself, and
+one for a MongoDB database. The latter will only be replicated to the swarm
+manager, and the database will be saved in a Docker volume.
 
-To install as a Stack, simply deploy our `docker-compose.yml` file. To install
-without having to check anything out, you can pipe it directly from GitHub.
+To install as an App, first [install Docker App in your
+swarm][docker-app-install]. Then simply install Discord Fate Bot using
 
 ```
-$ curl https://raw.githubusercontent.com/chrisbouchard/discord-fate-bot/master/docker-compose.yml | \
-      docker stack deploy --compose-file - discord-fate-bot
+$ docker secret create discord-fate-bot-token -
+# Enter your Discord Bot Auth Token
+$ docker secret create discord-fate-bot-mongo-password -
+# Enter a root password for the MongoDB service
+$ docker app install chrisbouchard/discord-fate-bot-app
 ```
+
+Using the default name, the services created will be `discord-fate-bot-app_app`
+for the bot service, and `discord-fate-bot-app_mongo` for the MongoDB service.
+You can use the standard Docker Swarm tools to manage them, e.g., `docker
+service logs` to view logs.
+
+When a new version of Discord Fate Bot is released, you can update your
+application to the latest version using
+
+```
+$ docker app upgrade discord-fate-bot-app --app-name=chrisbouchard/discord-fate-bot-app
+```
+
+[docker-app]: https://github.com/docker/app
 
 ### Installing from PyPI
 
