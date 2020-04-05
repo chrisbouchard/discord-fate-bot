@@ -1,5 +1,5 @@
 # Version of the application
-version: $VERSION
+version: 0.3.3
 
 # Name of the application
 name: discord-fate-bot-app
