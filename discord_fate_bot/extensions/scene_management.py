@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 
 from discord import NotFound
@@ -20,26 +21,26 @@ class AspectName(Converter):
     async def convert(self, ctx, name):
         if not name:
             raise BadArgument('An aspect must have a name')
+        if '\n' in name:
+            raise BadArgument('An aspect name must be one line')
         return str(name)
 
-class AspectTag(Converter):
+
+class BoostTag(Converter):
     async def convert(self, ctx, tag):
-        split = tag.split('=', maxsplit=1)
-        key = split[0]
+        if tag != 'boost':
+            raise BadArgument('Expected: boost')
+        return ('boost', True)
 
-        try:
-            value = split[1]
-        except IndexError:
-            value = None
+class InvokesTag(Converter):
+    async def convert(self, ctx, tag):
+        key, _, value = tag.partition('=')
 
-        if key == 'boost':
-            return (key, True)
-        elif key == 'invokes':
-            if value is None:
-                raise BadArgument('Expected: invokes=COUNT')
-            return (key, int(value))
+        if key != 'invokes' or value is None:
+            raise BadArgument('Expected: invokes=COUNT')
+        return ('invokes', int(value))
 
-        raise BadArgument(f'Unrecognized tag key: {key}')
+AspectTag = Union[BoostTag, InvokesTag]
 
 
 class SceneManagementCog(Cog, name='Scene Management'):
@@ -109,7 +110,7 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await self._react_ok(ctx)
 
     @aspect.command(name='modify', aliases=['mod'])
-    async def aspect_modify(self, ctx, aspect_id: int, *, name: AspectName):
+    async def aspect_modify(self, ctx, aspect_id: int, tags: Greedy[AspectTag], *, name: AspectName = None):
         """Modify an existing aspect"""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
@@ -118,7 +119,15 @@ class SceneManagementCog(Cog, name='Scene Management'):
         if aspect is None:
             raise RuntimeError('No aspect in the current scene with that id')
 
-        aspect.name = name
+        # TODO: Do some error checking (negative invokes, boost without
+        # invokes, etc.)
+        if tags:
+            tags_dict = dict(tags)
+            aspect = dataclasses.update(aspect, **tags_dict)
+
+        if name:
+            aspect = dataclasses.update(aspect, name=name)
+
         await self._save_scene_and_update_message(ctx, scene)
         await self._react_ok(ctx)
 
