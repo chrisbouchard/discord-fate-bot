@@ -63,6 +63,9 @@ class Scene(Document, version=1):
         except KeyError:
             raise AspectIdError(aspect_id)
 
+    def replace_aspect(self, aspect_id: int, aspect: SceneAspect):
+        self.aspects[str(aspect_id)] = aspect
+
     def __str__(self):
         description = self.description or 'Current Scene'
 

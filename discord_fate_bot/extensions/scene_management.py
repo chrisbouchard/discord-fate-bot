@@ -30,9 +30,9 @@ class AspectName(Converter):
 
 class BoostTag(Converter):
     async def convert(self, ctx, tag):
-        if tag != 'boost':
+        if tag in ('boost', '-boost'):
             raise BadArgument('Expected: boost')
-        return ('boost', True)
+        return ('boost', tag[0] == '-')
 
 class InvokesTag(Converter):
     async def convert(self, ctx, tag):
@@ -125,11 +125,12 @@ class SceneManagementCog(Cog, name='Scene Management'):
         # invokes, etc.)
         if tags:
             tags_dict = dict(tags)
-            aspect = dataclasses.update(aspect, **tags_dict)
+            aspect = dataclasses.replace(aspect, **tags_dict)
 
         if name:
-            aspect = dataclasses.update(aspect, name=name)
+            aspect = dataclasses.replace(aspect, name=name)
 
+        scene.replace_aspect(aspect_id, aspect)
         await self._save_scene_and_update_message(ctx, scene)
         await self._react_ok(ctx)
 
