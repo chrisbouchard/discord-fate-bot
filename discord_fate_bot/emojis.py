@@ -1,3 +1,7 @@
+import random
+
+from discord import Message
+
 SCENE_EMOJI = '\N{Clapper Board}'
 ROLL_EMOJI = '\N{Game Die}'
 
@@ -21,4 +25,18 @@ SUCCESS_EMOJIS = [
     '\N{Thumbs Up Sign}',
     '\N{White Heavy Check Mark}',
 ]
+
+
+def random_error_emoji():
+    return random.choice(ERROR_EMOJIS)
+
+def random_success_emoji():
+    return random.choice(SUCCESS_EMOJIS)
+
+
+async def react_error(message):
+    await message.add_reaction(random_error_emoji())
+
+async def react_success(message):
+    await message.add_reaction(random_success_emoji())
 

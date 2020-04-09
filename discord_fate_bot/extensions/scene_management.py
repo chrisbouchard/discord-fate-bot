@@ -1,6 +1,5 @@
 import dataclasses
 import logging
-import random
 
 from discord import NotFound
 from discord.ext.commands import Bot, Cog, Converter, Greedy, command, group
@@ -8,8 +7,9 @@ from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
 from ..bot import DiscordFateBot
-from ..emojis import SUCCESS_EMOJIS
+from ..emojis import react_success
 from ..scenes import NoCurrentSceneError, Scene, SceneAspect, SceneDao
+from ..tags import BoolTag, CountTag, Separator
 
 logger = logging.getLogger(__name__)
 
@@ -28,20 +28,17 @@ class AspectName(Converter):
         return str(name)
 
 
-class BoostTag(Converter):
-    async def convert(self, ctx, tag):
-        if tag in ('boost', '-boost'):
-            raise BadArgument('Expected: boost')
-        return ('boost', tag[0] == '-')
+class BoostTag(BoolTag, tag_name='boost'):
+    def apply_to_aspect(self, aspect: SceneAspect):
+        aspect.boost = self.value
+        aspect.invokes = max(aspect.invokes, 1)
 
-class InvokesTag(Converter):
-    async def convert(self, ctx, tag):
-        key, _, value = tag.partition('=')
+class InvokesTag(CountTag, tag_name='invokes'):
+    def apply_to_aspect(self, aspect: SceneAspect):
+        aspect.invokes = self.apply(aspect.invokes)
 
-        if key != 'invokes' or value is None:
-            raise BadArgument('Expected: invokes=COUNT')
-        return ('invokes', int(value))
-
+# Make sure to update _apply_aspect_tags when adding tags, so we know in what
+# order to apply them.
 AspectTag = Union[BoostTag, InvokesTag]
 
 
@@ -80,24 +77,25 @@ class SceneManagementCog(Cog, name='Scene Management'):
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
         await self._delete_scene_and_unpin_message(ctx, scene)
-        await self._react_ok(ctx)
+        await react_success(ctx.message)
 
 
-    @group(invoke_without_command=True)
-    async def aspect(self, ctx, tags: Greedy[AspectTag], *, name: AspectName):
+    @group(
+        invoke_without_command=True,
+        usage='[tags]... [--] <name>',
+    )
+    async def aspect(self, ctx, tags: Greedy[AspectTag], sep: Optional[Separator], *, name: AspectName):
         """Create a new aspect in the scene"""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
 
-        # TODO: Do some error checking (negative invokes, boost without
-        # invokes, etc.)
-        tags_dict = dict(tags)
-
-        new_aspect = SceneAspect(name=name, **tags_dict)
+        new_aspect = SceneAspect(name=name)
+        self._apply_aspect_tags(tags, new_aspect)
+        new_aspect.validate("The new aspect is not valid")
 
         scene.add_aspect(new_aspect)
         await self._save_scene_and_update_message(ctx, scene)
-        await self._react_ok(ctx)
+        await react_success(ctx.message)
 
     @aspect.command(name='remove', aliases=['rem'])
     async def aspect_remove(self, ctx, aspect_ids: Greedy[int]):
@@ -109,10 +107,14 @@ class SceneManagementCog(Cog, name='Scene Management'):
             scene.remove_aspect(aspect_id)
 
         await self._save_scene_and_update_message(ctx, scene)
-        await self._react_ok(ctx)
+        await react_success(ctx.message)
 
-    @aspect.command(name='modify', aliases=['mod'])
-    async def aspect_modify(self, ctx, aspect_id: int, tags: Greedy[AspectTag], *, name: AspectName = None):
+    @aspect.command(
+        name='modify',
+        aliases=['mod'],
+        usage='<aspect_id> [tags]... [--] <name>',
+    )
+    async def aspect_modify(self, ctx, aspect_id: int, tags: Greedy[AspectTag], sep: Optional[Separator], *, name: AspectName = None):
         """Modify an existing aspect"""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
@@ -121,19 +123,23 @@ class SceneManagementCog(Cog, name='Scene Management'):
         if aspect is None:
             raise RuntimeError('No aspect in the current scene with that id')
 
-        # TODO: Do some error checking (negative invokes, boost without
-        # invokes, etc.)
-        if tags:
-            tags_dict = dict(tags)
-            aspect = dataclasses.replace(aspect, **tags_dict)
-
         if name:
-            aspect = dataclasses.replace(aspect, name=name)
+            aspect.name = name
+
+        self._apply_aspect_tags(tags, aspect)
+        aspect.validate(f"Modified aspect {aspect_id} is not valid")
 
         scene.replace_aspect(aspect_id, aspect)
         await self._save_scene_and_update_message(ctx, scene)
-        await self._react_ok(ctx)
+        await react_success(ctx.message)
 
+
+    def _apply_aspect_tags(self, tags, aspect):
+        tag_dict = { type(tag): tag for tag in tags }
+
+        for tag_cls in (BoostTag, InvokesTag):
+            if tag_cls in tag_dict:
+                tag_dict[tag_cls].apply_to_aspect(aspect)
 
     async def _delete_scene_and_unpin_message(self, ctx, scene):
         await self.scene_dao.remove(scene.channel_id)
@@ -145,9 +151,6 @@ class SceneManagementCog(Cog, name='Scene Management'):
             except NotFound:
                 # That's ok, if it doesn't exist we just won't unpin it.
                 pass
-
-    async def _react_ok(self, ctx):
-        await ctx.message.add_reaction(random.choice(SUCCESS_EMOJIS))
 
     async def _save_scene_and_update_message(self, ctx, scene):
         await self.scene_dao.save(scene)

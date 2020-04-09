@@ -5,6 +5,7 @@ from typing import Dict, Optional, Set
 
 from .database import Document, SubDocument
 from .emojis import SCENE_EMOJI
+from .util import ValidationError
 
 class NoCurrentSceneError(Exception):
     def __init__(self):
@@ -24,14 +25,29 @@ class SceneAspect(SubDocument):
     boost: bool = False
     invokes: int = 0
 
+    def validate(self, message: str):
+        complaints = []
+        if self.invokes < 0:
+            complaints.append('Invoke count should not be negative')
+        if not self.name:
+            complaints.append('Invoke count should not be negative')
+        if complaints:
+            raise ValidationError(message, complaints)
+
     def __str__(self):
         aspect_str = f'{self.name}'
+
+        # If the boost is out of invokes, cross it out. We won't remove it, but
+        # we can hint that it is dead.
+        if self.boost and self.invokes == 0:
+            aspect_str = f'~~{aspect_str}~~'
+
         tags = []
 
         if self.boost:
             tags.append('boost')
 
-        if self.invokes != 0:
+        if self.boost or self.invokes != 0:
             tags.append(f'invokes={self.invokes}')
 
         if tags:
@@ -75,7 +91,7 @@ class Scene(Document, version=1):
                 for id, aspect in self.aspects.items()
             )
         else:
-            aspects_str = '    •  _No aspects. Add some with !aspect._'
+            aspects_str = '    •  _No aspects. Add some with **!aspect**._'
 
         description_lines = description.splitlines()
         description_str = '\n'.join([
