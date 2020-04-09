@@ -3,6 +3,7 @@ from typing import Optional
 
 from ..dice import FateDiePool, Roll, RollContext, Value
 from ..emojis import ROLL_EMOJI
+from ..tags import Separator
 
 def setup(bot):
     bot.add_cog(RollingCog())
@@ -27,13 +28,6 @@ class Opposition(Converter):
         except ValueError:
             raise BadArgument('Opposition must be a number')
 
-class OppositionSigil(Converter):
-    """A separator."""
-    async def convert(self, ctx, argument):
-        if argument != 'vs':
-            raise BadArgument('Expected "vs"')
-        return argument
-
 
 class RollingCog(Cog, name = 'Rolling'):
     """Commands for rolling dice."""
@@ -42,7 +36,7 @@ class RollingCog(Cog, name = 'Rolling'):
     async def roll(
             self, ctx,
             modifiers: Greedy[Modifier],
-            vs: OppositionSigil = None,
+            vs: Separator('vs') = None,
             opposition: Opposition = None):
         """Roll with optional modifiers and opposition.
 
