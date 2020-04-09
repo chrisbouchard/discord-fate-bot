@@ -28,14 +28,18 @@ class SceneAspect(SubDocument):
     def validate(self, message: str):
         complaints = []
         if self.invokes < 0:
-            complaints.append('Invoke count should not be negative')
+            complaints.append('Invoke count must not be negative')
         if not self.name:
-            complaints.append('Invoke count should not be negative')
+            complaints.append('Name must not be blank')
         if complaints:
             raise ValidationError(message, complaints)
 
     def __str__(self):
         aspect_str = f'{self.name}'
+
+        # Italicize boosts
+        if self.boost:
+            aspect_str = f'_{aspect_str}_'
 
         # If the boost is out of invokes, cross it out. We won't remove it, but
         # we can hint that it is dead.
@@ -48,7 +52,7 @@ class SceneAspect(SubDocument):
             tags.append('boost')
 
         if self.boost or self.invokes != 0:
-            tags.append(f'invokes={self.invokes}')
+            tags.append(f'invokes\N{No-Break Space}×{self.invokes}')
 
         if tags:
             aspect_str += ' (' + ', '.join(tags) + ')'

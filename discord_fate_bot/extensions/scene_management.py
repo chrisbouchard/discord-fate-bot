@@ -2,7 +2,7 @@ import dataclasses
 import logging
 
 from discord import NotFound
-from discord.ext.commands import Bot, Cog, Converter, Greedy, command, group
+from discord.ext.commands import BadArgument, Bot, Cog, Converter, Greedy, command, group
 from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
@@ -26,20 +26,6 @@ class AspectName(Converter):
         if '\n' in name:
             raise BadArgument('An aspect name must be one line')
         return str(name)
-
-
-class BoostTag(BoolTag, tag_name='boost'):
-    def apply_to_aspect(self, aspect: SceneAspect):
-        aspect.boost = self.value
-        aspect.invokes = max(aspect.invokes, 1)
-
-class InvokesTag(CountTag, tag_name='invokes'):
-    def apply_to_aspect(self, aspect: SceneAspect):
-        aspect.invokes = self.apply(aspect.invokes)
-
-# Make sure to update _apply_aspect_tags when adding tags, so we know in what
-# order to apply them.
-AspectTag = Union[BoostTag, InvokesTag]
 
 
 class SceneManagementCog(Cog, name='Scene Management'):
@@ -71,6 +57,14 @@ class SceneManagementCog(Cog, name='Scene Management'):
 
         await self._save_scene_and_update_message(ctx, new_scene)
 
+    @scene.command(name='sync')
+    async def scene_sync(self, ctx):
+        """Sync the pinned scene message with the database"""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
+        await self._update_message(ctx, scene)
+        await react_success(ctx.message)
+
     @scene.command(name='end')
     async def scene_end(self, ctx):
         """End the existing scene"""
@@ -80,18 +74,25 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await react_success(ctx.message)
 
 
-    @group(
-        invoke_without_command=True,
-        usage='[tags]... [--] <name>',
-    )
-    async def aspect(self, ctx, tags: Greedy[AspectTag], sep: Optional[Separator], *, name: AspectName):
+    @group(invoke_without_command=True)
+    async def aspect(self, ctx, *, name: AspectName):
         """Create a new aspect in the scene"""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
 
         new_aspect = SceneAspect(name=name)
-        self._apply_aspect_tags(tags, new_aspect)
-        new_aspect.validate("The new aspect is not valid")
+
+        scene.add_aspect(new_aspect)
+        await self._save_scene_and_update_message(ctx, scene)
+        await react_success(ctx.message)
+
+    @group(invoke_without_command=True)
+    async def boost(self, ctx, *, name: AspectName):
+        """Create a new boost in the scene"""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
+
+        new_aspect = SceneAspect(name=name, boost=True, invokes=1)
 
         scene.add_aspect(new_aspect)
         await self._save_scene_and_update_message(ctx, scene)
@@ -109,37 +110,67 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await self._save_scene_and_update_message(ctx, scene)
         await react_success(ctx.message)
 
-    @aspect.command(
-        name='modify',
-        aliases=['mod'],
-        usage='<aspect_id> [tags]... [--] <name>',
-    )
-    async def aspect_modify(self, ctx, aspect_id: int, tags: Greedy[AspectTag], sep: Optional[Separator], *, name: AspectName = None):
-        """Modify an existing aspect"""
+    @aspect.command(name='rename')
+    async def aspect_rename(self, ctx, aspect_id: int, *, name: AspectName):
+        """Rename an existing aspect"""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
+
         aspect = scene.get_aspect(aspect_id)
-
-        if aspect is None:
-            raise RuntimeError('No aspect in the current scene with that id')
-
-        if name:
-            aspect.name = name
-
-        self._apply_aspect_tags(tags, aspect)
-        aspect.validate(f"Modified aspect {aspect_id} is not valid")
+        aspect.name = name
 
         scene.replace_aspect(aspect_id, aspect)
         await self._save_scene_and_update_message(ctx, scene)
         await react_success(ctx.message)
 
+    @boost.command(name='upgrade')
+    async def boost_upgrade(self, ctx, aspect_id: int, *, name: AspectName = None):
+        """Upgrade an existing boost to a full aspect, optionally reaming it."""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
 
-    def _apply_aspect_tags(self, tags, aspect):
-        tag_dict = { type(tag): tag for tag in tags }
+        aspect = scene.get_aspect(aspect_id)
 
-        for tag_cls in (BoostTag, InvokesTag):
-            if tag_cls in tag_dict:
-                tag_dict[tag_cls].apply_to_aspect(aspect)
+        if not aspect.boost:
+            raise BadArgument(f'Aspect with id {aspect_id} is not a boost.')
+
+        aspect.boost = False
+
+        if name:
+            aspect.name = name
+
+        scene.replace_aspect(aspect_id, aspect)
+        await self._save_scene_and_update_message(ctx, scene)
+        await react_success(ctx.message)
+
+    @group(invoke_without_command=True)
+    async def invoke(self, ctx, aspect_id: int):
+        """Remove one invoke from an aspect"""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
+
+        aspect = scene.get_aspect(aspect_id)
+
+        if aspect.invokes > 0:
+            aspect.invokes -= 1
+
+        scene.replace_aspect(aspect_id, aspect)
+        await self._save_scene_and_update_message(ctx, scene)
+        await react_success(ctx.message)
+
+    @invoke.command(name='add')
+    async def invoke_add(self, ctx, aspect_id: int):
+        """Add one invoke to an aspect"""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
+
+        aspect = scene.get_aspect(aspect_id)
+        aspect.invokes += 1
+
+        scene.replace_aspect(aspect_id, aspect)
+        await self._save_scene_and_update_message(ctx, scene)
+        await react_success(ctx.message)
+
 
     async def _delete_scene_and_unpin_message(self, ctx, scene):
         await self.scene_dao.remove(scene.channel_id)
@@ -154,7 +185,9 @@ class SceneManagementCog(Cog, name='Scene Management'):
 
     async def _save_scene_and_update_message(self, ctx, scene):
         await self.scene_dao.save(scene)
+        await self._update_message(ctx, scene)
 
+    async def _update_message(self, ctx, scene):
         # Make a copy because we many modify the set in the loop.
         copied_message_ids = scene.message_ids.copy()
 
