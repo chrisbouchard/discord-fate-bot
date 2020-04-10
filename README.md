@@ -63,25 +63,45 @@ Every aspect is given an ID &mdash; a unique number within the scene &mdash;
 which is used to refer to the aspect after creation (for example, to remove
 it).
 
-* `!aspect [TAGS]... NAME` &mdash; Add a new aspect to the current scene.
-  Tags may be included, separated by spaces. After tags, the rest of the line
-  will be used the aspect name.
-    * `boost` &mdash; Tag this aspect as a boost, which means it automatically
-      disappears when it runs out of invokes.
-        * **TODO:** A boost should implicitly add one free invoke if the
-          `invokes` tag is not specified.
-    * `invokes=COUNT` &mdash; Tag this aspect with some number of free
-      invokes attached.
+* `!aspect NAME` &mdash; Add a new aspect to the current scene. The rest of the
+  line will be used the aspect name.
     * Example: `!aspect Darkness of night`
-    * Example: `!aspect boost invokes=2 Really awesome aspect name`
 * `!aspect remove ID...` &mdash; Remove one or more aspects from the scene.
-* `!aspect modify ID [TAGS]... [NAME]` &mdash; Rename an existing aspect. Tags
-  may be included, which update those tags only. The rest of the line, if any,
-  will be used as the new aspect name.
+* `!aspect rename ID [NAME]` &mdash; Rename an existing aspect. The rest of the
+  line will be used as the new aspect name.
     * Example: `!aspect modify 2 New aspect name`
-    * Example: `!aspect modify 2 invokes=1`
-* **TODO:** `!aspect invoke ID` &mdash; Decrease the number of remaining free
-  invokes for the specified aspect.
+
+### `!boost`
+
+Add or manage boosts in the current scene. All the rules from `!aspect` apply
+for this command as well. Note that boosts are still aspects, so they can be
+manipulated with `!aspect remove` and `!aspect rename`.
+
+* `!boost NAME` &mdash; Add a new boost to the current scene. The rest of the
+  line will be used the aspect name. Boosts are always created with one free
+  invoke.
+    * Example: `!boost Slippery banana peel`
+* `!boost upgrade ID [NAME]` &mdash; Upgrade a boost to a full aspect,
+  optionally renaming it in the process. The rest of the line, if any, will be
+  used the new aspect name.
+* `!boost downgrade ID [NAME]` &mdash; Upgrade an existing aspect to a boost,
+  optionally renaming it in the process. The rest of the line, if any, will be
+  used the new aspect name.
+
+### `!invoke`
+
+* `!invoke ID` &mdash; Decrease the number of remaining free invokes for the
+  specified aspect.
+    * Example: `!invoke 3` to remove a free invoke from Aspect \#3.
+    * **TODO:** If and when we introduce a Fate Point tracker, we will likely
+      have this command tie in, so that an aspect can be invoked for a Fate
+      Point.
+* `!invoke add [[+|-]AMOUNT] ID` &mdash; Add (or remove) a number of free
+  invokes from the specified aspect. The amount is optional (the default is
+  `+1`), but it must start with `+` or `-`.
+    * Example: `!invoke add 2` to add one free invoke to Aspect \#2.
+    * Example: `!invoke add +2 1` to add two free invokes to Aspect \#1.
+    * Example: `!invoke add -1 3` to _remove_ one free invoke from Aspect \#3.
 
 ### Future Commands
 
