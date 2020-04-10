@@ -9,7 +9,6 @@ from typing import Dict, List, Optional, Union
 from ..bot import DiscordFateBot
 from ..emojis import react_success
 from ..scenes import NoCurrentSceneError, Scene, SceneAspect, SceneDao
-from ..tags import BoolTag, CountTag, Separator
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +25,17 @@ class AspectName(Converter):
         if '\n' in name:
             raise BadArgument('An aspect name must be one line')
         return str(name)
+
+class AdjustInvokes(Converter):
+    """An amount to adjust invokes."""
+
+    async def convert(self, ctx, argument):
+        if argument[:1] not in ('+', '-'):
+            raise BadArgument('Expected: [+|-]VALUE')
+        try:
+            return int(argument)
+        except ValueError:
+            raise BadArgument('Expected a number')
 
 
 class SceneManagementCog(Cog, name='Scene Management'):
@@ -143,9 +153,29 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await self._save_scene_and_update_message(ctx, scene)
         await react_success(ctx.message)
 
+    @boost.command(name='downgrade')
+    async def boost_downgrade(self, ctx, aspect_id: int, *, name: AspectName = None):
+        """Downgrade an existing aspect to a boost, optionally reaming it."""
+        channel_id = ctx.channel.id
+        scene = await self.scene_dao.find(channel_id)
+
+        aspect = scene.get_aspect(aspect_id)
+
+        if aspect.boost:
+            raise BadArgument(f'Aspect with id {aspect_id} is already a boost.')
+
+        aspect.boost = True
+
+        if name:
+            aspect.name = name
+
+        scene.replace_aspect(aspect_id, aspect)
+        await self._save_scene_and_update_message(ctx, scene)
+        await react_success(ctx.message)
+
     @group(invoke_without_command=True)
     async def invoke(self, ctx, aspect_id: int):
-        """Remove one invoke from an aspect"""
+        """Invoke an aspect. This will remove an invoke if available."""
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
 
@@ -159,13 +189,21 @@ class SceneManagementCog(Cog, name='Scene Management'):
         await react_success(ctx.message)
 
     @invoke.command(name='add')
-    async def invoke_add(self, ctx, aspect_id: int):
-        """Add one invoke to an aspect"""
+    async def invoke_add(self, ctx, amount: Optional[AdjustInvokes], aspect_id: int):
+        """Add invokes (by default one) to an aspect.
+
+        AMOUNT
+
+          The optional amount argument should start with "+" or "-" to indicate
+          adding or removing invokes. An aspect cannot wind up with fewer than
+          zero invokes.
+        """
         channel_id = ctx.channel.id
         scene = await self.scene_dao.find(channel_id)
 
         aspect = scene.get_aspect(aspect_id)
-        aspect.invokes += 1
+        aspect.invokes += (amount if amount is not None else 1)
+        aspect.validate(f'The result for aspect {aspect_id} is not valid.')
 
         scene.replace_aspect(aspect_id, aspect)
         await self._save_scene_and_update_message(ctx, scene)

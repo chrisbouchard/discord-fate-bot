@@ -5,7 +5,7 @@ from typing import Dict, Optional, Set
 
 from .database import Document, SubDocument
 from .emojis import SCENE_EMOJI
-from .util import ValidationError
+from .util import ValidationError, pluralize
 
 class NoCurrentSceneError(Exception):
     def __init__(self):
@@ -52,7 +52,7 @@ class SceneAspect(SubDocument):
             tags.append('boost')
 
         if self.boost or self.invokes != 0:
-            tags.append(f'invokes\N{No-Break Space}×{self.invokes}')
+            tags.append(f'{self.invokes}\N{No-Break Space}{pluralize(self.invokes, "invoke", "invokes")}')
 
         if tags:
             aspect_str += ' (' + ', '.join(tags) + ')'

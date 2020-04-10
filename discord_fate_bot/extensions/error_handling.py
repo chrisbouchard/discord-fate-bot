@@ -17,6 +17,8 @@ class ErrorHandlingCog(Cog):
     @Cog.listener()
     async def on_command_error(self, ctx, error):
         try:
+            original_error = error
+
             # Commands wrap their exceptions with this one.
             if isinstance(error, CommandInvokeError):
                 error = error.__cause__
@@ -50,16 +52,16 @@ class ErrorHandlingCog(Cog):
             else:
                 message = f"Sorry, something unexpected went wrong."
                 await send_error_message(ctx, message)
-                raise error
+                raise original_error
         except Exception as ex:
             # This whole method is basically a catch clause, but we don't get
             # implicit exception chaining. So let's just add our own explicit
             # chaining.
-            if error == ex:
+            if ex == original_error:
                 # Don't try to chain the exception to itself. This gives us an
                 # escape hatch if we need to re-raise the exception.
-                raise
-            raise ex from error
+                raise original_error
+            raise ex from original_error
 
 async def send_error_message(ctx, message, *, help_separator='\n\n'):
     """Send an error message with our standard boilerplate."""
