@@ -240,6 +240,9 @@ class SceneManagementCog(Cog, name='Scene Management'):
                 # That's ok, if it doesn't exist we just won't unpin it.
                 pass
 
+        # Clear out the list of messages to be safe. There are none now.
+        scene.message_ids.clear()
+
     async def _save_scene_and_update_message(self, ctx, scene):
         await self.scene_dao.save(scene)
         await self._update_message(ctx, scene)
