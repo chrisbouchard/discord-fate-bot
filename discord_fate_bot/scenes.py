@@ -4,6 +4,8 @@ from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from typing import Dict, Optional, Set
 
 from .database import Document, SubDocument
+from .emojis import SCENE_EMOJI
+from .util import ValidationError, pluralize
 
 class NoCurrentSceneError(Exception):
     def __init__(self):
@@ -23,15 +25,34 @@ class SceneAspect(SubDocument):
     boost: bool = False
     invokes: int = 0
 
+    def validate(self, message: str):
+        complaints = []
+        if self.invokes < 0:
+            complaints.append('Invoke count must not be negative')
+        if not self.name:
+            complaints.append('Name must not be blank')
+        if complaints:
+            raise ValidationError(message, complaints)
+
     def __str__(self):
         aspect_str = f'{self.name}'
+
+        # Italicize boosts
+        if self.boost:
+            aspect_str = f'_{aspect_str}_'
+
+        # If the boost is out of invokes, cross it out. We won't remove it, but
+        # we can hint that it is dead.
+        if self.boost and self.invokes == 0:
+            aspect_str = f'~~{aspect_str}~~'
+
         tags = []
 
         if self.boost:
             tags.append('boost')
 
-        if self.invokes != 0:
-            tags.append(f'invokes={self.invokes}')
+        if self.boost or self.invokes != 0:
+            tags.append(f'{self.invokes}\N{No-Break Space}{pluralize(self.invokes, "invoke", "invokes")}')
 
         if tags:
             aspect_str += ' (' + ', '.join(tags) + ')'
@@ -62,6 +83,9 @@ class Scene(Document, version=1):
         except KeyError:
             raise AspectIdError(aspect_id)
 
+    def replace_aspect(self, aspect_id: int, aspect: SceneAspect):
+        self.aspects[str(aspect_id)] = aspect
+
     def __str__(self):
         description = self.description or 'Current Scene'
 
@@ -71,9 +95,19 @@ class Scene(Document, version=1):
                 for id, aspect in self.aspects.items()
             )
         else:
-            aspects_str = '    •  _No aspects. Add some with !aspect._'
+            aspects_str = '    •  _No aspects. Add some with **!aspect**._'
 
-        return f':clapper:  __**{description}**__\n{aspects_str}'
+        description_lines = description.splitlines()
+        description_str = '\n'.join([
+            f'__**{description_lines[0]}**__',
+            *description_lines[1:],
+        ])
+
+        if len(description_lines) > 1:
+            description_str += '\n'
+
+        return f'{SCENE_EMOJI}  {description_str}\n{aspects_str}'
+
 
 class SceneDao:
     database: AsyncIOMotorDatabase

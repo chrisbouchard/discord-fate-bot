@@ -1,6 +1,7 @@
 import aiorun
 import logging
 
+from . import __version__ as dfb_version
 from .bot import DiscordFateBot
 from .config import Config
 from .database import get_database
@@ -12,7 +13,7 @@ def main():
     config = Config.from_environ()
     configure_logging(config)
 
-    logger.info('Starting bot...')
+    logger.info(f'Starting Discord Fate Bot {dfb_version}...')
 
     async def _main():
         database = await get_database(config)
