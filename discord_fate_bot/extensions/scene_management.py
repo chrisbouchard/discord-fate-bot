@@ -1,8 +1,10 @@
 import dataclasses
 import logging
 
+from asyncio import Lock
+from collections import defaultdict
 from discord import NotFound
-from discord.ext.commands import BadArgument, Bot, Cog, Converter, Greedy, command, group
+from discord.ext.commands import BadArgument, Bot, Cog, Converter, Greedy, command, group, guild_only
 from discord.utils import escape_markdown, find
 from typing import Dict, List, Optional, Union
 
@@ -43,10 +45,27 @@ class SceneManagementCog(Cog, name='Scene Management'):
 
     bot: DiscordFateBot
     scene_dao: SceneDao
+    scene_locks: Dict[int, Lock]
 
     def __init__(self, bot: DiscordFateBot):
         self.bot = bot
         self.scene_dao = SceneDao(bot.database)
+        self.scene_locks = defaultdict(Lock)
+
+
+    async def cog_check(self, ctx):
+        """Ensure that scene management is only implemented for guilds."""
+        return await guild_only().predicate(ctx)
+
+    async def cog_before_invoke(self, ctx):
+        """Gate each command by a per-channel lock."""
+        channel_id = ctx.channel.id
+        await self.scene_locks[channel_id].acquire()
+
+    async def cog_after_invoke(self, ctx):
+        """Release the per-channel lock."""
+        channel_id = ctx.channel.id
+        self.scene_locks[channel_id].release()
 
 
     @group(invoke_without_command=True)

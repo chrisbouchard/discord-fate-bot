@@ -1,7 +1,9 @@
 import logging
 import textwrap
 
-from discord.ext.commands import Cog, CommandNotFound, CommandInvokeError, UserInputError
+from discord.ext.commands import (
+    CheckFailure, Cog, CommandNotFound, CommandInvokeError, UserInputError
+)
 
 from ..emojis import random_error_emoji
 from ..scenes import AspectIdError, NoCurrentSceneError
@@ -23,17 +25,22 @@ class ErrorHandlingCog(Cog):
             if isinstance(error, CommandInvokeError):
                 error = error.__cause__
 
-            if isinstance(error, CommandNotFound) or isinstance(error, UserInputError):
+            if isinstance(error, AspectIdError):
+                message = (
+                    f"Sorry, there's no aspect in the current scene with id " \
+                    f"{error.aspect_id}."
+                )
+                await send_error_message(ctx, message)
+            elif isinstance(error, CommandNotFound) or isinstance(error, UserInputError):
                 message = (
                     f"Sorry, I didn't understand:\n\n" \
                     f"{quote(ctx.message)}\n\n" \
                     f"{punctuate(error)}"
                 )
                 await send_error_message(ctx, message, help_separator=' ')
-            elif isinstance(error, AspectIdError):
+            elif isinstance(error, CheckFailure):
                 message = (
-                    f"Sorry, there's no aspect in the current scene with id " \
-                    f"{error.aspect_id}."
+                    f"Sorry, that command cannot be used right now. {punctuate(error)}"
                 )
                 await send_error_message(ctx, message)
             elif isinstance(error, NoCurrentSceneError):
@@ -68,23 +75,22 @@ async def send_error_message(ctx, message, *, help_separator='\n\n'):
     emoji = random_error_emoji()
 
     if ctx.command:
-        help_command = '!help ' + format_command_for_help(ctx.command)
+        help_command = '!help ' + ctx.command.qualified_name
     else:
         help_command = '!help'
 
+    if ctx.guild:
+        mention = f"{ctx.author.mention} "
+        dm_offer = f"(Feel free to DM that to {ctx.me.mention}.)"
+    else:
+        mention = ""
+        dm_offer = ""
+
     final_message = (
-        f"{emoji}  {ctx.author.mention} {message}{help_separator}" \
-        f"Try **{help_command}** for more information. "\
-        f"(Feel free to DM {ctx.me.mention}.)"
+        f"{emoji}  {mention}{message}{help_separator}" \
+        f"Try **{help_command}** for more information. {dm_offer}"
     )
     await ctx.send(content=final_message)
-
-def format_command_for_help(command):
-    result = ''
-    if command.parent:
-        result += format_command_for_help(command.parent) + ' '
-    result += command.name
-    return result
 
 def quote(message):
     content = message.content
