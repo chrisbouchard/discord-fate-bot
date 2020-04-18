@@ -258,9 +258,9 @@ class SceneManagementCog(Cog, name='Scene Management'):
 
                 edited_any = True
             except NotFound:
-                # Ok, we couldn't find it so we couldn't edit it. But we'll
-                # create a new message now. We'll remove the message id since
-                # it's not valid anymore.
+                # Ok, we couldn't find it so we couldn't edit it. We'll remove
+                # the message id since it's not valid anymore. If there are no
+                # valid message ids, we'll create a new message below.
                 self.message_ids.remove(message_id)
 
         if not scene.message_ids:
